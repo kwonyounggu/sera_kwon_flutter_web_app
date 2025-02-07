@@ -3,7 +3,7 @@ import 'package:drkwon/model/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/states.dart';
+//import '../data/states.dart';
 
 class AppDrawerWidget extends ConsumerWidget 
 {
@@ -30,68 +30,64 @@ class AppDrawerWidget extends ConsumerWidget
     (
       children: <Widget>
       [
-        buildHeader(context, ref, fontSize),
-        buildMenuItem(context, ref, MenuItem.home, fontSize),
-        //expantiontile and buildMenuItem
-      ],
+        Expanded
+        (
+          child: ListView
+          (
+            padding: EdgeInsets.zero,
+            children: <Widget>
+            [ 
+              buildHeader(context, ref, fontSize),
+              buildMenuItem(context, ref, MenuItem.home, fontSize),
+              //expantiontile and buildMenuItem
+              ExpansionTile
+              (
+                leading: Icon(drawerItems[MenuItem.services]!.icon),
+                title: AutoSizeText
+                (
+                  drawerItems[MenuItem.services]!.title,
+                  minFontSize: 18,
+                  maxFontSize: 28,
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                /*initiallyExpanded: _isServicesExpanded,
+                onExpansionChanged: (expanded) 
+                {
+                  setState(() 
+                  {
+                    _isServicesExpanded = expanded;
+                  });
+                },*/
+                childrenPadding: EdgeInsets.only(left:20),
+                children: <Widget>
+                [
+                  for (MenuItem item in [MenuItem.cataracts, 
+                                                      MenuItem.glaucoma, 
+                                                      MenuItem.diabetic_retinopathy,
+                                                      MenuItem.macular_degeneration,
+                                                      MenuItem.lazy_eye,
+                                                      MenuItem.pink_eye,
+                                                      MenuItem.dry_eyes,
+                                                      MenuItem.other_diseases
+                                                      ])
+                    buildMenuItem(context, ref, item, fontSize),
+                ],
+              ),
+              for (MenuItem item in [MenuItem.blog, 
+                                              MenuItem.faq, 
+                                              MenuItem.contact,
+                                              MenuItem.settings,
+                                              MenuItem.profile,
+                                              ])
+                  buildMenuItem(context, ref, item, fontSize),
+            ]
+          )
+        ),
+        buildMenuItem(context, ref, MenuItem.logout, fontSize)
+      ]
     );
   }
-  void _onMenuItemSelected(MenuItem item, BuildContext context) 
-  {
-    switch (item) 
-    {
-      case MenuItem.home:
-        context.goNamed(drawerItems[MenuItem.home]!.routingName);
-        break;
-      case MenuItem.services:
-        context.goNamed(drawerItems[MenuItem.services]!.routingName);
-        break;
-      case MenuItem.cataracts:
-        context.goNamed(drawerItems[MenuItem.cataracts]!.routingName);
-        break;
-      case MenuItem.glaucoma:
-        context.goNamed(drawerItems[MenuItem.glaucoma]!.routingName);
-        break;
-      case MenuItem.diabetic_retinopathy:
-        context.goNamed(drawerItems[MenuItem.diabetic_retinopathy]!.routingName);
-        break;
-      case MenuItem.macular_degeneration:
-        context.goNamed(drawerItems[MenuItem.macular_degeneration]!.routingName);
-        break;
-      case MenuItem.lazy_eye:
-        context.goNamed(drawerItems[MenuItem.lazy_eye]!.routingName);
-        break;
-      case MenuItem.pink_eye:
-        context.goNamed(drawerItems[MenuItem.pink_eye]!.routingName);
-        break;
-      case MenuItem.dry_eyes:
-        context.goNamed(drawerItems[MenuItem.dry_eyes]!.routingName);
-        break;
-      case MenuItem.other_diseases:
-        context.goNamed(drawerItems[MenuItem.other_diseases]!.routingName);
-        break;
-      case MenuItem.blog:
-        context.goNamed(drawerItems[MenuItem.blog]!.routingName);
-        break;
-      case MenuItem.faq:
-        context.goNamed(drawerItems[MenuItem.home]!.routingName);
-        break;
-      case MenuItem.contact:
-        context.goNamed(drawerItems[MenuItem.contact]!.routingName);
-        break;
-      case MenuItem.settings:
-        context.goNamed(drawerItems[MenuItem.settings]!.routingName);
-        break;
-      case MenuItem.profile:
-        context.goNamed(drawerItems[MenuItem.profile]!.routingName);
-        break;
-      case MenuItem.logout:
-        // Handle logout logic
-        break;
-      default:
-        break;
-    }
-  }
+
   Widget buildMenuItem(BuildContext context, WidgetRef ref,  MenuItem item, double fontSize) 
   {
     return ListTile
@@ -108,7 +104,7 @@ class AppDrawerWidget extends ConsumerWidget
       onTap: ()
       {
         Navigator.pop(context);
-        context.goNamed(drawerItems[item]!.routingName);
+        context.go(drawerItems[item]!.routingName);
       },
     );
   }
