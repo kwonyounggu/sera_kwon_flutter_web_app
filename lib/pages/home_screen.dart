@@ -21,8 +21,8 @@ class HomeScreen extends ConsumerStatefulWidget
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
 {
-  Place selectedPlace = allPlaces[0];
-  void changePlace(Place place) => setState(() => selectedPlace = place);
+  //Place selectedPlace = allPlaces[0];
+  //void changePlace(Place place) => setState(() => selectedPlace = place);
   
   @override
   Widget build(BuildContext context) 
@@ -35,42 +35,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
       //drawer: const AppDrawer(), // Add the drawer here
       //drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: DrawerWidget()) : null,
-      drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget()) : null,
+      drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget(isMobile: true)) : null,
       body: ResponsiveWidget
       (
         mobile: buildMobile(),
         tablet: buildTablet(),
         desktop: buildDesktop(),
       ),
-      /*body: Center
-      (
-        child: Column
-        (
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: 
-          [
-            const Text('Welcome to the Home Screen!'),
-            const SizedBox(height: 20),
-            ElevatedButton
-            (
-              onPressed: () 
-              {
-                context.goNamed('profile'); // Navigate to Profile Screen using named route
-              },
-              child: const Text('Go to Profile'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton
-            (
-              onPressed: () 
-              {
-                context.go('/unknown'); // Navigate to an unknown route
-              },
-              child: const Text('Go to Unknown Route'),
-            ),
-          ],
-        ),
-      ),*/
     );
   }
 
@@ -82,7 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   (
         children: 
         [
-          const Expanded(flex: 2, child: AppDrawerWidget()),
+          const Expanded(flex: 2, child: AppDrawerWidget(isMobile: false)),
           Expanded
           (
             flex: 5,
@@ -96,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   (
         children: 
         [
-          const Expanded(child: AppDrawerWidget()),
+          const Expanded(child: AppDrawerWidget(isMobile: false)),
           Expanded(flex: 3, child: buildBody()),
         ],
       );

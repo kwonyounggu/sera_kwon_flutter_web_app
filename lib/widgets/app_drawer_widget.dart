@@ -7,24 +7,13 @@ import 'package:go_router/go_router.dart';
 
 class AppDrawerWidget extends ConsumerWidget 
 {
-  const AppDrawerWidget({super.key});
+  final bool isMobile;
+  const AppDrawerWidget({super.key, required this.isMobile});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) 
   {
     final fontSize = MediaQuery.of(context).size.width * 0.025;
-
-    /*
-    return ListView.builder
-    (
-      itemCount: allStates.length + 1,
-      itemBuilder: (context, index) 
-      {
-        return index == 0
-            ? buildHeader(fontSize)
-            : buildMenuItem(index, fontSize);
-      },
-    );*/
 
     return Column
     (
@@ -62,23 +51,23 @@ class AppDrawerWidget extends ConsumerWidget
                 children: <Widget>
                 [
                   for (MenuItem item in [MenuItem.cataracts, 
-                                                      MenuItem.glaucoma, 
-                                                      MenuItem.diabetic_retinopathy,
-                                                      MenuItem.macular_degeneration,
-                                                      MenuItem.lazy_eye,
-                                                      MenuItem.pink_eye,
-                                                      MenuItem.dry_eyes,
-                                                      MenuItem.other_diseases
-                                                      ])
+                                        MenuItem.glaucoma, 
+                                        MenuItem.diabetic_retinopathy,
+                                        MenuItem.macular_degeneration,
+                                        MenuItem.lazy_eye,
+                                        MenuItem.pink_eye,
+                                        MenuItem.dry_eyes,
+                                        MenuItem.other_diseases
+                                        ])
                     buildMenuItem(context, ref, item, fontSize),
                 ],
               ),
               for (MenuItem item in [MenuItem.blog, 
-                                              MenuItem.faq, 
-                                              MenuItem.contact,
-                                              MenuItem.settings,
-                                              MenuItem.profile,
-                                              ])
+                                    MenuItem.faq, 
+                                    MenuItem.contact,
+                                    MenuItem.settings,
+                                    MenuItem.profile,
+                                    ])
                   buildMenuItem(context, ref, item, fontSize),
             ]
           )
@@ -103,7 +92,7 @@ class AppDrawerWidget extends ConsumerWidget
       selected: false,
       onTap: ()
       {
-        Navigator.pop(context);
+        if (isMobile) Navigator.pop(context);
         context.go(drawerItems[item]!.routingName);
       },
     );
@@ -140,7 +129,7 @@ class AppDrawerWidget extends ConsumerWidget
               ),
             ),
             // Close Button
-            Positioned
+            if (isMobile) Positioned
             (
               right: 10,
               top: 10,
