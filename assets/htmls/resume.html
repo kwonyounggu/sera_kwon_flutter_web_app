@@ -4,19 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>John Doe - Resume</title>
-  <script>
-    function navigateToHome() 
-    {   console.log('-----kdkkd');
-        if (window.navigator && window.navigator.postMessage) 
-        {
-                window.navigator.postMessage('/profile'); // Send message to Flutter
-        }
-        else 
-        {
-            alert("Flutter WebView not connected!");
-        }
-    }
-</script>
+
   <style>
     body 
     {
@@ -95,8 +83,9 @@
         <p>Email: john.doe@example.com</p>
         <p>Phone: +1234567890</p>
         <p>Address: 123 Main St, City, Country</p>
-        <p>Website: <a href="../login">https://johndoe.com</a></p>
-        <p>Website: <a href="javascript:void(0);" onclick="navigateToHome()">Go to profile</a></p>
+        <p>Website: <a href="javascript:window.updateFromJs('/login')">Go to login</a></p>
+        <p>Website: <a href="#" id="clickLink">Click me1!</a></p>
+        <p>Website: <a href="#" onclick="callDartFunction(); return false;">Click me2!</a></p>
       </div>
     </header>
 
@@ -165,5 +154,36 @@
       </ul>
     </section>
   </div>
+  <script src="flutter_bootstrap.js" defer></script>
+  <script>
+    function callDartFunction() 
+    {
+        // Wait for Flutter to load
+        if (typeof window.updateFromJs === "function") 
+        {
+            window.updateFromJs("Hello from temp.html!");
+        } 
+        else 
+        {
+            console.error("Dart function not available yet!");
+        }
+    }
+    document.getElementById("clickLink").addEventListener("click", function(event) {
+            event.preventDefault();
+            callDartFunction();
+        });
+
+    // Wait for Flutter to be ready
+    function waitForFlutter() {
+            if (typeof window.updateFromJs === "function") {
+                console.log("✅ Dart function is available!");
+            } else {
+                console.warn("⏳ Waiting for Dart function...");
+                setTimeout(waitForFlutter, 500);
+            }
+        }
+
+        waitForFlutter(); // Start checking
+</script>
 </body>
 </html>

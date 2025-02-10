@@ -1,14 +1,21 @@
-//import 'package:drkwon/data/resume_data.dart';
-import 'dart:convert';
+@JS() // ✅ Add this to enable JavaScript interop
+library my_flutter_app; // ✅ Required for JS interop
 
+import 'dart:convert';
+import 'dart:js';
+import 'dart:js_util' as js_util; // ✅ Import dart:js_util
 import 'package:drkwon/riverpod_providers/router_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:js/js.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 import 'package:webview_flutter_web/webview_flutter_web.dart';
 
+// ✅ Expose a JavaScript function globally
+@JS('updateFromJs')
+external set _jsUpdateMessage(void Function(String message) f);
 
 class ResumeWidget extends ConsumerStatefulWidget
 {
@@ -21,32 +28,7 @@ class ResumeWidget extends ConsumerStatefulWidget
 
 class _ResumeWidgetState extends ConsumerState<ResumeWidget>
 {
-  /*
-  final PlatformWebViewController _controller = PlatformWebViewController
-  (
-    const PlatformWebViewControllerCreationParams(),
-  )..loadRequest
-  (
-      LoadRequestParams
-      (
-        uri: Uri.parse('https://google.com'),
-      ),
-  );
-  @override
-  void initState() 
-  {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) 
-  {
-    return  PlatformWebViewWidget
-      (
-        PlatformWebViewWidgetCreationParams(controller: _controller),
-      ).build(context);
-  }
-  */
+  String _path = '/'; //This path is from html file
 
   late final WebViewController _controller;
   PlatformWebViewWidget? _webViewWidget; // Nullable to avoid LateInitializationError
@@ -55,6 +37,15 @@ class _ResumeWidgetState extends ConsumerState<ResumeWidget>
   void initState() 
   {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback
+    (
+      (_) 
+      {
+        _exposeToJs(); // ✅ Ensure it's registered after Flutter loads
+      }
+    );
+
     _initializeWebView();
   }
 
@@ -65,37 +56,10 @@ class _ResumeWidgetState extends ConsumerState<ResumeWidget>
     final String dataUrl = 'data:text/html;base64,$encodedHtml';
 
     _controller = WebViewController();
-
-    // Enable JavaScript
-    _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
-
-    // Listen for JavaScript messages (From `window.navigator.postMessage('/home')`)
-    _controller.addJavaScriptChannel
-    (
-      'postMessage',
-      onMessageReceived: (JavaScriptMessage message) 
-      {
-        final String route = message.message;
-        if (mounted) 
-        {
-          logger.d("here route: $route");
-          //context.go(route); // Navigate in Flutter using GoRouter
-        }
-      },
-    );
     await _controller.loadRequest(Uri.parse(dataUrl));
-
     final PlatformWebViewControllerCreationParams params = const PlatformWebViewControllerCreationParams();
-
     final PlatformWebViewController platformController = PlatformWebViewController(params);
-
-    
-
-    
-    
-    
     await platformController.loadRequest(LoadRequestParams(uri: Uri.parse(dataUrl)));
-
     final PlatformWebViewWidgetCreationParams widgetParams = PlatformWebViewWidgetCreationParams(controller: platformController);
 
     setState
@@ -105,6 +69,29 @@ class _ResumeWidgetState extends ConsumerState<ResumeWidget>
         _webViewWidget = PlatformWebViewWidget(widgetParams);
       }
     ); // Trigger rebuild to display WebView
+  }
+
+  void updateMessage(String path) 
+  {
+    setState
+    (
+      () 
+      {
+        _path = path;
+        print("_path=$_path");
+      }
+    );
+  }
+  void _exposeToJs() 
+  {
+    // Make Dart function callable from JavaScript
+    _jsUpdateMessage = allowInterop(updateMessage);
+   
+
+    // ✅ Explicitly attach the function to `window`
+    js_util.setProperty(js_util.globalThis, 'updateFromJs', allowInterop(updateMessage));
+
+    debugPrint("Dart function registered!");
   }
 
   @override

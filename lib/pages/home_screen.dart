@@ -1,5 +1,6 @@
 import 'package:drkwon/data/places.dart';
 import 'package:drkwon/model/place.dart';
+import 'package:drkwon/pages/about/resume_screen.dart';
 import 'package:drkwon/widgets/app_drawer_widget.dart';
 import 'package:drkwon/widgets/drawer_widget.dart';
 import 'package:drkwon/widgets/place_details_widget.dart';
@@ -47,7 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   //********************************************** */
   //Widget buildMobile() => PlaceGalleryWidget(onPlaceChanged: changePlace);
-  Widget buildMobile() => ResumeWidget();
+  Widget buildMobile() => ResumeScreen();
 
   Widget buildTablet() => Row
   (
@@ -58,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           (
             flex: 5,
             //child: PlaceGalleryWidget(onPlaceChanged: changePlace),
-            child: ResumeWidget(),
+            child: ResumeScreen(),
           ),
         ],
   );
@@ -87,7 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               // onPlaceChanged: changePlace,
               //  isHorizontal: true,
               //),
-              child: ResumeWidget(),
+              child: ResumeScreen(),
             ),
             //Expanded
             //(

@@ -1,0 +1,179 @@
+class ResumeEditor extends StatefulWidget {
+  final ResumeProvider resumeProvider;
+
+  ResumeEditor({required this.resumeProvider});
+
+  @override
+  _ResumeEditorState createState() => _ResumeEditorState();
+}
+
+class _ResumeEditorState extends State<ResumeEditor> {
+  late Map<String, dynamic> _editedResume;
+
+  @override
+  void initState() {
+    super.initState();
+    _editedResume = Map.from(widget.resumeProvider.resumeData);
+  }
+
+  void _saveChanges() {
+    widget.resumeProvider.updateResume(_editedResume);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Resume updated successfully!')),
+    );
+  }
+
+  void _addEducation() {
+    setState(() {
+      _editedResume['education'].add({
+        'degree': '',
+        'institution': '',
+        'graduation': '',
+      });
+    });
+  }
+
+  void _addExperience() {
+    setState(() {
+      _editedResume['experience'].add({
+        'title': '',
+        'employer': '',
+        'duration': '',
+        'responsibilities': [],
+      });
+    });
+  }
+
+  void _addSkill() {
+    setState(() {
+      _editedResume['skills'].add('');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Personal Information
+          Text('Personal Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          TextField(
+            decoration: InputDecoration(labelText: 'Name'),
+            controller: TextEditingController(text: _editedResume['name']),
+            onChanged: (value) => _editedResume['name'] = value,
+          ),
+          TextField(
+            decoration: InputDecoration(labelText: 'Address'),
+            controller: TextEditingController(text: _editedResume['address']),
+            onChanged: (value) => _editedResume['address'] = value,
+          ),
+          TextField(
+            decoration: InputDecoration(labelText: 'Phone'),
+            controller: TextEditingController(text: _editedResume['phone']),
+            onChanged: (value) => _editedResume['phone'] = value,
+          ),
+          TextField(
+            decoration: InputDecoration(labelText: 'Email'),
+            controller: TextEditingController(text: _editedResume['email']),
+            onChanged: (value) => _editedResume['email'] = value,
+          ),
+          SizedBox(height: 20),
+
+          // Education
+          Text('Education', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ..._editedResume['education'].asMap().entries.map((entry) {
+            int index = entry.key;
+            var education = entry.value;
+            return Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(labelText: 'Degree'),
+                  controller: TextEditingController(text: education['degree']),
+                  onChanged: (value) => _editedResume['education'][index]['degree'] = value,
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Institution'),
+                  controller: TextEditingController(text: education['institution']),
+                  onChanged: (value) => _editedResume['education'][index]['institution'] = value,
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Graduation Date'),
+                  controller: TextEditingController(text: education['graduation']),
+                  onChanged: (value) => _editedResume['education'][index]['graduation'] = value,
+                ),
+                SizedBox(height: 10),
+              ],
+            );
+          }).toList(),
+          ElevatedButton(
+            onPressed: _addEducation,
+            child: Text('Add Education'),
+          ),
+          SizedBox(height: 20),
+
+          // Experience
+          Text('Experience', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ..._editedResume['experience'].asMap().entries.map((entry) {
+            int index = entry.key;
+            var experience = entry.value;
+            return Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(labelText: 'Title'),
+                  controller: TextEditingController(text: experience['title']),
+                  onChanged: (value) => _editedResume['experience'][index]['title'] = value,
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Employer'),
+                  controller: TextEditingController(text: experience['employer']),
+                  onChanged: (value) => _editedResume['experience'][index]['employer'] = value,
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Duration'),
+                  controller: TextEditingController(text: experience['duration']),
+                  onChanged: (value) => _editedResume['experience'][index]['duration'] = value,
+                ),
+                ...experience['responsibilities'].asMap().entries.map((respEntry) {
+                  int respIndex = respEntry.key;
+                  return TextField(
+                    decoration: InputDecoration(labelText: 'Responsibility ${respIndex + 1}'),
+                    controller: TextEditingController(text: experience['responsibilities'][respIndex]),
+                    onChanged: (value) => _editedResume['experience'][index]['responsibilities'][respIndex] = value,
+                  );
+                }).toList(),
+                SizedBox(height: 10),
+              ],
+            );
+          }).toList(),
+          ElevatedButton(
+            onPressed: _addExperience,
+            child: Text('Add Experience'),
+          ),
+          SizedBox(height: 20),
+
+          // Skills
+          Text('Skills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ..._editedResume['skills'].asMap().entries.map((entry) {
+            int index = entry.key;
+            return TextField(
+              decoration: InputDecoration(labelText: 'Skill ${index + 1}'),
+              controller: TextEditingController(text: _editedResume['skills'][index]),
+              onChanged: (value) => _editedResume['skills'][index] = value,
+            );
+          }).toList(),
+          ElevatedButton(
+            onPressed: _addSkill,
+            child: Text('Add Skill'),
+          ),
+          SizedBox(height: 20),
+
+          // Save Button
+          ElevatedButton(
+            onPressed: _saveChanges,
+            child: Text('Save Changes'),
+          ),
+        ],
+      ),
+    );
+  }
+}
