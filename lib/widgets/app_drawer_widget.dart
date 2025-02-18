@@ -35,9 +35,10 @@ class AppDrawerWidget extends ConsumerWidget
                 title: AutoSizeText
                 (
                   drawerItems[MenuItem.services]!.title,
-                  minFontSize: 18,
-                  maxFontSize: 28,
+                  minFontSize: 12,
+                  maxFontSize: 22,
                   style: TextStyle(fontSize: fontSize),
+                  maxLines: 2,
                 ),
                 /*initiallyExpanded: _isServicesExpanded,
                 onExpansionChanged: (expanded) 
@@ -85,15 +86,16 @@ class AppDrawerWidget extends ConsumerWidget
       title: AutoSizeText
       (
         drawerItems[item]!.title,
-        minFontSize: 18,
-        maxFontSize: 28,
+        minFontSize: 12,
+        maxFontSize: 22,
         style: TextStyle(fontSize: fontSize),
+        maxLines: 2,
       ),
       selected: false,
       onTap: ()
       {
         if (isMobile) Navigator.pop(context);
-        context.go(drawerItems[item]!.routingName);
+        context.go(drawerItems[item]!.routingPath);
       },
     );
   }
@@ -123,7 +125,7 @@ class AppDrawerWidget extends ConsumerWidget
               child: AutoSizeText
               (
                 'My Drawer Header',
-                minFontSize: 22,
+                minFontSize: 20,
                 maxFontSize: 30,
                 style: TextStyle(fontSize: fontSize, color: Colors.white),
               ),

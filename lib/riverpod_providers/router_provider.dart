@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -5,7 +6,7 @@ import 'package:drkwon/errors/not_found_screen.dart';
 import 'package:drkwon/pages/home_screen.dart';
 import 'package:drkwon/pages/login/create_account_screen.dart';
 import 'package:drkwon/pages/login/login_screen.dart';
-import 'package:drkwon/pages/login/profile_screen.dart';
+import 'package:drkwon/pages/about/profile_screen.dart';
 import 'package:drkwon/pages/state_data_down_up/color_mixer_screen.dart';
 import 'package:drkwon/pages/tasks/task_screen.dart';
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
@@ -20,6 +21,7 @@ final routerProvider = Provider<GoRouter>
 
     return GoRouter
     (
+      initialLocation: '/home',
       routes: 
       [
         GoRoute
@@ -76,14 +78,14 @@ final routerProvider = Provider<GoRouter>
         for redirecting purposes. 
         *********************************/
         final location = state.uri.toString();
-        
+        debugPrint("-----location----: $location");
         logger.d('here -- 0 --, isLoggedIn = $isLoggedIn location = $location fullPath = ${state.fullPath} matchedLocation = ${state.matchedLocation} path = ${state.path}');
         
         if (!isLoggedIn)
         {
           return '/login';
         }
-
+        
 
         // No redirect needed
         return null;

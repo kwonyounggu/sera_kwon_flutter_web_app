@@ -5,7 +5,8 @@ const String resumeJson = '''
   "address": "123 Main St, Toronto, ON, M1M 1M1",
   "phone": "(416) 555-1234",
   "email": "jane.doe@example.com",
-  "education": [
+  "education": 
+  [
     {
       "degree": "Doctor of Optometry (OD)",
       "institution": "University of Waterloo, Waterloo, ON",
@@ -17,12 +18,14 @@ const String resumeJson = '''
       "graduation": "June 2014"
     }
   ],
-  "experience": [
+  "experience": 
+  [
     {
       "title": "Optometrist",
       "employer": "Clear Vision Clinic, Toronto, ON",
       "duration": "July 2018 - Present",
-      "responsibilities": [
+      "responsibilities": 
+      [
         "Conduct comprehensive eye exams",
         "Diagnose and treat eye diseases",
         "Prescribe corrective lenses and contact lenses"
@@ -32,13 +35,15 @@ const String resumeJson = '''
       "title": "Optometrist Intern",
       "employer": "Waterloo Eye Care, Waterloo, ON",
       "duration": "May 2017 - June 2018",
-      "responsibilities": [
+      "responsibilities": 
+      [
         "Assisted in eye exams and patient care",
         "Learned advanced diagnostic techniques"
       ]
     }
   ],
-  "skills": [
+  "skills": 
+  [
     "Comprehensive eye exams",
     "Diagnosis and treatment of eye diseases",
     "Contact lens fitting and management",

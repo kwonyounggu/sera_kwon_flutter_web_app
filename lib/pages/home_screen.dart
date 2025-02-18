@@ -1,10 +1,10 @@
-import 'package:drkwon/data/places.dart';
-import 'package:drkwon/model/place.dart';
+//import 'package:drkwon/data/places.dart';
+//import 'package:drkwon/model/place.dart';
 import 'package:drkwon/pages/about/resume_screen.dart';
 import 'package:drkwon/widgets/app_drawer_widget.dart';
-import 'package:drkwon/widgets/drawer_widget.dart';
-import 'package:drkwon/widgets/place_details_widget.dart';
-import 'package:drkwon/widgets/place_gallery_widget.dart';
+//import 'package:drkwon/widgets/drawer_widget.dart';
+//import 'package:drkwon/widgets/place_details_widget.dart';
+//import 'package:drkwon/widgets/place_gallery_widget.dart';
 import 'package:drkwon/widgets/responsive_widget.dart';
 import 'package:drkwon/widgets/resume_widget.dart';
 import 'package:flutter/material.dart';
