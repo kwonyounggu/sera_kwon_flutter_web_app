@@ -40,7 +40,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   {
     if (profile == null) 
     {
-      return Scaffold(
+      return Scaffold
+      (
         appBar: AppBar(title: Text("Profile")),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -48,12 +49,16 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Scaffold(
       appBar: AppBar(title: Text(profile!['name'])),
-      body: Padding(
+      body: Padding
+      (
         padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
+        child: SingleChildScrollView
+        (
+          child: Column
+          (
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: 
+            [
               buildSectionTitle("Contact"),
               buildText("LinkedIn: ${profile!['contact']['linkedin']}", true),
               SizedBox(height: 10),
@@ -78,28 +83,36 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget buildSectionTitle(String title) {
-    return AutoSizeText(
+  Widget buildSectionTitle(String title) 
+  {
+    return AutoSizeText
+    (
       title,
       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       maxLines: 1,
     );
   }
 
-  Widget buildText(String text, bool isLink) {
-    return AutoSizeText(
+  Widget buildText(String text, bool isLink) 
+  {
+    return AutoSizeText
+    (
       text,
       style: TextStyle(fontSize: 16, color: isLink ? Colors.blue : Colors.black),
       maxLines: 2,
     );
   }
 
-  Widget buildExperience(Map<String, dynamic> exp) {
-    return Padding(
+  Widget buildExperience(Map<String, dynamic> exp) 
+  {
+    return Padding
+    (
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
+      child: Column
+      (
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: 
+        [
           buildText("${exp['position']} at ${exp['organization']}", true),
           buildText("${exp['duration']}", false),
           ...exp['responsibilities'].map<Widget>((resp) => buildText("- $resp", false)).toList(),
@@ -108,12 +121,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget buildEducation(Map<String, dynamic> edu) {
-    return Padding(
+  Widget buildEducation(Map<String, dynamic> edu) 
+  {
+    return Padding
+    (
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
+      child: Column
+      (
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: 
+        [
           buildText("${edu['degree']}", true),
           buildText("${edu['institution']} (${edu['years']})", false),
         ],
