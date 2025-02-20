@@ -25,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Future<void> loadJson() async 
   {
-    String jsonString = await rootBundle.loadString('data_files/profile.json');
+    String jsonString = await rootBundle.loadString('assets/data_files/profile.json');
     setState
     (
       () 
@@ -47,8 +47,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text(profile!['name'])),
+    return Scaffold
+    (
+      //appBar: AppBar(title: Text(profile!['name'])),
       body: Padding
       (
         padding: EdgeInsets.all(16.0),

@@ -38,7 +38,7 @@ class LoginScreen extends ConsumerWidget
               },
               child: const Text('Login'),
             ),
-            const SizedBox(height: 20),
+            /*const SizedBox(height: 20),
             TextButton
             (
               onPressed: () 
@@ -46,7 +46,7 @@ class LoginScreen extends ConsumerWidget
                 context.goNamed('create_account'); // Navigate to account creation
               },
               child: const Text('Create an Account'),
-            ),
+            ),*/
           ],
         ),
       ),

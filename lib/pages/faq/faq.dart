@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-class HomeScreen extends ConsumerStatefulWidget 
+class FaqScreen extends ConsumerStatefulWidget 
 {
-  const HomeScreen({super.key});
+  const FaqScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() => _HomeScreenState();
+  _FaqScreenState createState() => _FaqScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
+class _FaqScreenState extends ConsumerState<FaqScreen>
 {
   @override
   Widget build(BuildContext context) 
@@ -21,7 +21,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     (
       body: const Center
       (
-        child: Text('Home Under construction.'),
+        child: Text('Faaq Under construction.'),
       ),
     );
   }

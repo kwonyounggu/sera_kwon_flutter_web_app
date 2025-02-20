@@ -25,27 +25,28 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
     (
       appBar: AppBar
       (
-        leading: Padding
+        title: Row
         (
-          padding: EdgeInsets.only(left: 16.0), // Add padding to fit the logo
-          //child: Image.asset('images/logo.png', fit: BoxFit.contain), // Local image
-          child: Row
-          (
-            mainAxisSize: MainAxisSize.min, // Prevent extra space
-            children: [
-              Image.asset(
-                'images/logo.png', // Local image
-                //height: 30, // Adjust size
-              ),
-              SizedBox(width: 8), // Space between logo and text
-              Text(
-                'Company',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: 
+          [
+            Image.asset('assets/images/logo.png', height: 40), // Logo
+            SizedBox(width: 10),
+            Text('Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
+            Expanded
+            (
+              child: Center
+              (
+                child: Text
+                (
+                  widget.currentPath,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                  overflow: TextOverflow.ellipsis, // Prevent overflow issues
+                )
+              )
+            )
+          ],
         ),
-        title: Text(widget.currentPath),
       ),
       drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget(isMobile: true)) : null,
       body: ResponsiveWidget

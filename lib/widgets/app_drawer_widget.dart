@@ -26,7 +26,7 @@ class AppDrawerWidget extends ConsumerWidget
             padding: EdgeInsets.zero,
             children: <Widget>
             [ 
-              buildHeader(context, ref, fontSize),
+              if (isMobile) buildHeader(context, ref, fontSize),
               buildMenuItem(context, ref, MenuItem.home, fontSize),
               //expantiontile and buildMenuItem
               ExpansionTile
@@ -35,8 +35,8 @@ class AppDrawerWidget extends ConsumerWidget
                 title: AutoSizeText
                 (
                   drawerItems[MenuItem.services]!.title,
-                  minFontSize: 12,
-                  maxFontSize: 22,
+                  minFontSize: 16,
+                  maxFontSize: 18,
                   style: TextStyle(fontSize: fontSize),
                   maxLines: 2,
                 ),
@@ -86,8 +86,8 @@ class AppDrawerWidget extends ConsumerWidget
       title: AutoSizeText
       (
         drawerItems[item]!.title,
-        minFontSize: 12,
-        maxFontSize: 22,
+        minFontSize: 16,
+        maxFontSize: 18,
         style: TextStyle(fontSize: fontSize),
         maxLines: 2,
       ),
@@ -109,7 +109,7 @@ class AppDrawerWidget extends ConsumerWidget
         image: DecorationImage
         (
           fit: BoxFit.cover,
-          image: ExactAssetImage('assets/images/swat.jpg'),
+          image: ExactAssetImage('assets/images/logo.png'),
         ),
       ),
       child: Container
@@ -125,13 +125,13 @@ class AppDrawerWidget extends ConsumerWidget
               child: AutoSizeText
               (
                 'My Drawer Header',
-                minFontSize: 20,
-                maxFontSize: 30,
+                minFontSize: 16,
+                maxFontSize: 18,
                 style: TextStyle(fontSize: fontSize, color: Colors.white),
               ),
             ),
             // Close Button
-            if (isMobile) Positioned
+            Positioned
             (
               right: 10,
               top: 10,
