@@ -25,12 +25,14 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
     (
       appBar: AppBar
       (
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Colors.transparent,
         title: Row
         (
           mainAxisAlignment: MainAxisAlignment.start,
           children: 
           [
-            Image.asset('assets/images/logo.png', height: 40), // Logo
+            Image.asset('assets/images/logo.jpg', height: 40), // Logo
             SizedBox(width: 10),
             Text('Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
             Expanded
