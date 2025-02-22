@@ -1,6 +1,11 @@
 
+import 'dart:convert';
+
+import 'package:drkwon/data/home_page.dart';
+import 'package:drkwon/utils/mla_paragraph.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 
 class HomeScreen extends ConsumerStatefulWidget 
@@ -17,7 +22,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) 
   {
-    return Scaffold(
+    final jsonData = jsonDecode(homePageJson);
+    return Scaffold
+    (
       /*appBar: AppBar
       (
         scrolledUnderElevation: 0.0,
@@ -37,9 +44,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             // Hero Section
             _buildHeroSection(),
             // About the Optometrist Section
-            _buildAboutSection(),
+            _buildAboutSection(jsonData['about_dr_kwon']),
             // Clinic Overview Section
-            _buildClinicOverviewSection(),
+            _buildClinicOverviewSection(jsonData['about_our_clinic']),
             SizedBox(height: 20),
             // Services Overview
             _buildServicesSection(),
@@ -55,6 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         onPressed: () 
         {
           // Navigate to appointment booking
+          context.go('/book-an-appointment');
         },
         child: Icon(Icons.calendar_today),
       ),
@@ -102,10 +110,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
-          ElevatedButton(
+          ElevatedButton
+          (
             onPressed: () 
             {
               // Navigate to appointment booking
+              context.go('/book-an-appointment');
             },
             
             style: ElevatedButton.styleFrom
@@ -120,64 +130,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-    Widget _buildAboutSection() 
+    Widget _buildAboutSection(List paragraphs) 
     {
-    return Container
-    (
-      padding: EdgeInsets.all(20),
-      child: Column
+      //for (var item in paragraphs)
+      //{
+      //    debugPrint(item);
+      //}
+
+      return Container
       (
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: 
-        [
-          Text
-          (
-            'About Dr. S Kwon',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[900],
-            ),
-          ),
-          SizedBox(height: 20),
-          Text
-          (
-            'Dr. S Kwon is a highly skilled and compassionate optometrist with over 10 years of experience in advanced eye care. She holds a Doctor of Optometry (O.D.) degree from the University of Waterloo, School of Optometry and Vision Science, and an Honours Bachelor of Science in Neuroscience from the University of Toronto.',
-            style: TextStyle
+        padding: EdgeInsets.all(20),
+        child: Column
+        (
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: 
+          [
+            Text
             (
-              fontSize: 16,
-              color: Colors.grey[800],
+              'About Dr. S Kwon',
+              style: TextStyle
+              (
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[900],
+              ),
             ),
-            textAlign: TextAlign.justify,
-          ),
-          SizedBox(height: 10),
-          Text
-          (
-            'Dr. Kwon specializes in a wide range of eye care services, including cataract management, glaucoma treatment, dry eye therapy, and custom contact lens fitting. She is certified in Paragon CRT Orthokeratology Lens, Valley Contax Custom Stable Scleral Contact Lens Fitting, and BE FREE Orthokeratology Lens. Her dedication to patient care and her expertise in ocular disease management have earned her numerous accolades, including the Scholar\'s Award and the Queen Elizabeth II Aiming For the Top Scholarship.',
-            style: TextStyle
-            (
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-            textAlign: TextAlign.justify,
-          ),
-          SizedBox(height: 10),
-          Text
-          (
-            'Dr. Kwon is passionate about improving her patients\' quality of life through personalized eye care. She believes in educating her patients about their eye health and providing them with the best possible treatment options.',
-            style: TextStyle
-            (
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-            textAlign: TextAlign.justify,
-          ),
-        ],
-      ),
-    );
+            SizedBox(height: 20),
+            MLAParagraph(text: paragraphs[0]),
+            SizedBox(height: 10),
+            MLAParagraph(text: paragraphs[1]),
+            SizedBox(height: 10),
+            MLAParagraph(text: paragraphs[2]),
+          ],
+        ),
+      );
   }
 
-  Widget _buildClinicOverviewSection() 
+  Widget _buildClinicOverviewSection(List paragraphs) 
   {
     return Container
     (
@@ -187,7 +176,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: 
         [
-          Text(
+          Text
+          (
             'About Our Clinic',
             style: TextStyle
             (
@@ -197,37 +187,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
           SizedBox(height: 20),
-          Text
-          (
-            'Our clinic is a leading eye care center in Toronto, dedicated to providing exceptional vision care services. We specialize in diagnosing and treating a wide range of eye conditions, including cataracts, glaucoma, dry eye syndrome, and retinal diseases. Our mission is to deliver personalized, patient-centered care using the latest advancements in optometry and ophthalmology.',
-            style: TextStyle
-            (
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-            textAlign: TextAlign.justify,
-          ),
+          MLAParagraph(text: paragraphs[0]),
           SizedBox(height: 10),
-          Text
-          (
-            'We collaborate closely with renowned eye surgeons in Toronto to ensure seamless care for our patients. Whether you need routine eye exams, advanced diagnostic testing, or surgical co-management, our team is here to support you every step of the way.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-            textAlign: TextAlign.justify,
-          ),
+          MLAParagraph(text: paragraphs[1]),
           SizedBox(height: 10),
-          Text
-          (
-            'At our clinic, we prioritize your comfort and well-being. Our state-of-the-art facility is equipped with cutting-edge technology, and our friendly staff is committed to making your visit as pleasant as possible.',
-            style: TextStyle
-            (
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-            textAlign: TextAlign.justify,
-          ),
+          MLAParagraph(text: paragraphs[2]),
         ],
       ),
     );

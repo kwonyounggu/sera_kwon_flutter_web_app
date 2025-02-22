@@ -24,6 +24,7 @@ class MyApp extends ConsumerWidget
       theme: ThemeData
       (
         primarySwatch: Colors.blue,
+        fontFamily: 'Roboto',
       ),
       scrollBehavior: CustomScrollBehavior(),
     );

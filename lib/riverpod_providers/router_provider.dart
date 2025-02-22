@@ -1,6 +1,7 @@
 import 'package:drkwon/pages/blog/blog.dart';
 import 'package:drkwon/pages/contact/contact.dart';
 import 'package:drkwon/pages/faq/faq.dart';
+import 'package:drkwon/pages/home/appointment_screen.dart';
 import 'package:drkwon/pages/login/logout.dart';
 import 'package:drkwon/pages/services/cataracts.dart';
 import 'package:drkwon/pages/services/diabetic_retinopathy.dart';
@@ -79,7 +80,8 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
             GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileScreen()),
             GoRoute(path: '/settings', name: 'settings', builder: (context, state) => SettingsScreen()),
-            GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()),           
+            GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()), 
+            GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),            
           ],
         ),
       ],
