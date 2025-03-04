@@ -1,6 +1,9 @@
+import 'package:drkwon/utils/gmail_api_key.dart';
+import 'package:drkwon/utils/google_email.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart'; // For date formatting
+import 'package:http/http.dart' as http;
 
 class AppointmentScreen extends StatefulWidget 
 {
@@ -66,8 +69,10 @@ class _AppointmentScreenState extends State<AppointmentScreen>
   }
 
   // Function to send email
-  Future<void> _sendEmail() async {
-    if (_formKey.currentState!.validate() && _isRobot) {
+  Future<void> _sendEmail() async 
+  {
+    if (_formKey.currentState!.validate() && _isRobot) 
+    {
       // Collect all form data
       final String firstName = _firstNameController.text;
       final String lastName = _lastNameController.text;
@@ -93,36 +98,24 @@ class _AppointmentScreenState extends State<AppointmentScreen>
       ''';
 
       // Encode the email subject and body
-      final String subject = Uri.encodeComponent('New Appointment Booking');
-      final String body = Uri.encodeComponent(emailBody);
+      final String subject = 'New Appointment Booking';
+      final String body = emailBody;
 
-      // Define the email addresses
-      final String email1 = 'kwon.younggu@gmail.com';
-      final String email2 = 'webmonster.ca@gmail.com';
-
-      // Create the mailto URL
-      final Uri emailUri = Uri(
-        scheme: 'mailto',
-        path: '$email1,$email2',
-        queryParameters: 
-        {
-          'subject': subject,
-          'body': body,
-        },
+      final emailService = GoogleEmail
+      (
+        serviceAccountJson: serviceAccountJson,
+        //senderEmail: "kwon.younggu@gmail.com"
+        senderEmail: "gmail-api-sender@personal-eye-care-site.iam.gserviceaccount.com"
       );
 
-      // Launch the email client
-      if (await canLaunchUrl(emailUri)) 
+      try
       {
-        await launchUrl(emailUri);
-      } 
-      else 
+        await emailService.sendEmail(to: "webmonster.ca@gmail.com", subject: subject, body: body);
+        print("mail sent ...");
+      }
+      catch (e)
       {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar
-        (
-          SnackBar(content: Text('Could not launch email client.')),
-        );
+        print("Error: $e");
       }
     } 
     else if (!_isRobot) 
@@ -134,6 +127,78 @@ class _AppointmentScreenState extends State<AppointmentScreen>
     }
   }
 
+  /*
+  Future<void> _sendEmailToEmailJS() async 
+  {
+    if (_formKey.currentState!.validate() && _isRobot) 
+    {
+      // Collect all form data
+      final String firstName = _firstNameController.text;
+      final String lastName = _lastNameController.text;
+      final String dob = _dobController.text;
+      final String email = _emailController.text;
+      final String phone = _phoneController.text;
+      final String ohip = _ohipController.text;
+      final String service = _selectedService ?? 'Not Selected';
+      final String concern = _concernController.text;
+      final String urgency = _isUrgent ? 'Urgent' : 'Not Urgent';
+
+      final response = await http.post
+      (
+        Uri.parse('https://formspree.io/f/mdkajbdd'), // Replace with your Formspree URL
+        body: 
+        {
+          'First Name': firstName,
+        'Last Name': lastName,
+        'Date of Birth': dob,
+        'Email': email,
+        'Phone Number': phone,
+        'OHIP Number': ohip,
+        'Selected Service': service,
+        'Eye Health Concern': concern,
+        'Urgency': urgency
+        },
+      );
+
+      if (mounted) // Check if the widget is still mounted after await returns
+      { 
+        if (response.statusCode == 200) 
+        {
+          ScaffoldMessenger.of(context).showSnackBar //context will be null if not mounted
+          (
+            SnackBar(content: Text('Form submitted successfully!')), 
+          );
+          //Form Reset
+          _firstNameController.clear();
+          _lastNameController.clear();
+          _dobController.clear();
+          _ohipController.clear();
+          _concernController.clear();
+          _emailController.clear();
+          _phoneController.clear();
+        } 
+        else 
+        {
+          ScaffoldMessenger.of(context).showSnackBar
+          (
+            SnackBar(content: Text('Error submitting form.')),
+          );
+        }
+      }
+      else 
+      {
+        // Handle the case where the widget is no longer mounted
+        print('Widget was unmounted before SnackBar could be shown.');
+      }
+    } 
+    else if (!_isRobot) 
+    {
+      ScaffoldMessenger.of(context).showSnackBar
+      (
+        SnackBar(content: Text('Please verify that you are not a robot.')),
+      );
+    }
+  }*/
   @override
   Widget build(BuildContext context) 
   {
