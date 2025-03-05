@@ -17,7 +17,6 @@ import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jwt_decode/jwt_decode.dart';
 import 'package:logger/logger.dart';
 import 'package:drkwon/errors/not_found_screen.dart';
 import 'package:drkwon/pages/home/home_screen.dart';
@@ -37,10 +36,15 @@ final routerProvider = Provider<GoRouter>
 
     return GoRouter
     (
-      initialLocation: '/', // Start with login if authentication is required
+      initialLocation: '/login', // Start with login if authentication is required
       routes: <RouteBase>
       [
-        
+        GoRoute
+        (
+          path: '/login',
+          name: 'login', // Named route
+          builder: (context, state) => const LoginScreen(),
+        ),
         
         GoRoute
         (
@@ -80,83 +84,42 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/settings', name: 'settings', builder: (context, state) => SettingsScreen()),
             GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()), 
             GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),  
-  
-            GoRoute
-            (
-              path: '/login',
-              name: 'login', // Named route
-              builder: (context, state) => const LoginScreen(),
-            ),    
             GoRoute
             (
               path: '/login-token',
-              name: 'login-token',
-              builder: (context, state)
-               {
-                final token = state.uri.queryParameters['jwt'];
-
-                if (token != null) {
-                  try {
-                    Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
-                    print("Decoded Token: $decodedToken");
-                    final email = decodedToken['email'];  // Or 'sub' for subject, depending on your JWT claim
-                    if (email != null) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        ref.read(authNotifierProvider.notifier).login(email);
-      
-                        context.go('/blog');
-                      });
-                    } else {
-                      // Handle missing email claim in token.
-                      print("Error: 'email' claim not found in JWT");
-                      // Optionally redirect to an error page or login page.
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        context.go('/login'); // Or an error page
-                      });
-                    }
-                  } catch (e) {
-                    // Handle JWT decoding errors (invalid token, etc.)
-                    print("Error decoding JWT: $e");
-                    // Optionally redirect to an error page or login page.
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      context.go('/login'); // Or an error page
-                    });
-                  }
-                } else {
-                  // Handle case where JWT is missing from the URL
-                  print("Error: JWT missing from URL");
-                  // Optionally redirect to the login page
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    context.go('/login');
-                  });
-
-                }
-                return Scaffold(
-                  body: Center(child: CircularProgressIndicator()), // Show loading indicator
-                );
+              name: 'login-token', // Named route
+              builder: (context, state) 
+              {
+                  final token = state.uri.queryParameters['jwt'];
+                  return LoginTokenScreen(token: token);
               },
-            ),
-    
+            ),          
           ],
         ),
       ],
       redirect: (context, state) 
       {
         final isLoggedIn = authState.isLoggedIn;
-
+        /********************************
+        'state.matchedLocation' is Used in redirects:
+        When implementing redirects based on user state, 
+        state.matchedLocation is often used to check 
+        if the current route matches a specific path 
+        for redirecting purposes. 
+        *********************************/
         final location = state.uri.toString();
         //final isLoggingIn = state.uri.toString() == '/login';
         debugPrint("-----location----: $location");
         logger.d('here -- 0 --, isLoggedIn = $isLoggedIn location = $location fullPath = ${state.fullPath} matchedLocation = ${state.matchedLocation} path = ${state.path}');
         
-        if (!isLoggedIn && location == '/blog')
+        if (!isLoggedIn)
         {
           return '/login';
         }
-        //if (isLoggedIn && location == '/login')
-        //{
-        //  return '/';
-        //}
+        if (isLoggedIn && location == '/login')
+        {
+          return '/';
+        }
 
         // No redirection needed, allow navigation
         return null;

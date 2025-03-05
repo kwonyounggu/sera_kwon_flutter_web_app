@@ -1,6 +1,10 @@
+import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget 
 {
@@ -19,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen>
   bool _obscurePassword = true;
   bool _isChecked = false;
 
+  //ignore the following function now
   Future<void> _login() async 
   {
     if (_formKey.currentState!.validate()) 
@@ -56,6 +61,27 @@ class _LoginScreenState extends State<LoginScreen>
           SnackBar(content: Text('Login failed: ${response.body}')),
         );
       }
+    }
+  }
+
+  
+  Future<void> loginWithGoogle() async 
+  {
+    try
+    {
+        final Uri url = Uri.parse('http://localhost:8000/login/google');
+        if (await canLaunchUrl(url)) 
+        {
+          await launchUrl(url, webOnlyWindowName: '_self',);
+        } 
+        else 
+        {
+          print('Could not launch $url');
+        }
+    }
+    catch (e)
+    {
+      print('Error connecting to FastAPI: $e');
     }
   }
 
@@ -260,6 +286,7 @@ class _LoginScreenState extends State<LoginScreen>
                     onPressed: () 
                     {
                       // Add Google login logic here
+                      loginWithGoogle();
                     },
                   ),
                 ),
@@ -267,6 +294,26 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LoginTokenScreen extends ConsumerWidget 
+{
+  final String? token;
+
+  const LoginTokenScreen({super.key, this.token});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref)  
+  { print("LoginTokenScreen: token [$token]");
+    ref.read(authNotifierProvider.notifier).login('user123');
+    return Scaffold(
+      body: Center(
+        child: token != null
+            ? Text("JWT Token: $token")
+            : Text("No token found"),
       ),
     );
   }
