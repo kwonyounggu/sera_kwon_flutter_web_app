@@ -1,0 +1,1 @@
+final String FASTAPI_URL = "http://localhost:8000";

@@ -1,4 +1,5 @@
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
+import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -6,16 +7,18 @@ import 'dart:convert';
 
 import 'package:url_launcher/url_launcher.dart';
 
-class LoginScreen extends StatefulWidget 
+class LoginScreen extends ConsumerStatefulWidget 
 {
-  const LoginScreen({super.key});
+  final Function(String) onLoginSuccess; // Callback for successful login
+  final String? from;
+  const LoginScreen({super.key, required this.onLoginSuccess, this.from});
 
   @override
   // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> 
+class _LoginScreenState extends ConsumerState<LoginScreen> 
 {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -65,18 +68,36 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   
-  Future<void> loginWithGoogle() async 
+  Future<void> loginWithGoogle(BuildContext context, WidgetRef ref) async 
   {
     try
-    {
-        final Uri url = Uri.parse('http://localhost:8000/login/google');
+    {   print("==> from value in loginWidthGoogle: ${widget.from}");
+        // Get the current route
+        String googleLoginUrl = '$FASTAPI_URL/login/google';
+        if (widget.from != null && widget.from!.isNotEmpty) 
+        {
+          googleLoginUrl += '?state=${widget.from}'; // Correctly append the query parameter
+        }
+        print("==> googleLoginUrl value in loginWidthGoogle: $googleLoginUrl");
+        final Uri url = Uri.parse(googleLoginUrl);
         if (await canLaunchUrl(url)) 
         {
           await launchUrl(url, webOnlyWindowName: '_self',);
         } 
+        //if (await canLaunchUrl(url)) 
+        //{
+        //  await launchUrl
+        //  (
+        //    url,
+            //This approach will open the URL within the Flutter web app, maintaining the context of your application
+        //    webViewConfiguration: const WebViewConfiguration(enableJavaScript: true),
+        //  );
+          //widget.onLoginSuccess('user@example.com');
+        //}
         else 
         {
-          print('Could not launch $url');
+          //Remember to handle potential errors and provide appropriate feedback to the user if the URL cannot be launched
+          throw 'Could not launch $url';
         }
     }
     catch (e)
@@ -87,7 +108,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) 
-  {
+  {print("===> from value = ${widget.from}");
+    //final authState = ref.watch(authNotifierProvider);
     return Scaffold
     (
       appBar: AppBar
@@ -286,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen>
                     onPressed: () 
                     {
                       // Add Google login logic here
-                      loginWithGoogle();
+                      loginWithGoogle(context, ref);
                     },
                   ),
                 ),
@@ -294,26 +316,6 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class LoginTokenScreen extends ConsumerWidget 
-{
-  final String? token;
-
-  const LoginTokenScreen({super.key, this.token});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref)  
-  { print("LoginTokenScreen: token [$token]");
-    ref.read(authNotifierProvider.notifier).login('user123');
-    return Scaffold(
-      body: Center(
-        child: token != null
-            ? Text("JWT Token: $token")
-            : Text("No token found"),
       ),
     );
   }

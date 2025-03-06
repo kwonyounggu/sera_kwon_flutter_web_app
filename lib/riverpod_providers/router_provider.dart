@@ -85,53 +85,107 @@ final routerProvider = Provider<GoRouter>
             (
               path: '/login',
               name: 'login', // Named route
-              builder: (context, state) => const LoginScreen(),
+              builder: (context, state)
+              {
+                return LoginScreen
+                (
+                  onLoginSuccess: (String email)
+                  { // Pass the email after login
+                    final from = state.uri.queryParameters['from'];
+                    if (from != null) 
+                    {
+                      context.go(from);
+                    } 
+                    else 
+                    {
+                      context.go('/');
+                    }
+                  },
+                  from: state.uri.queryParameters['from'] // Pass the from query parameters
+                );
+              }
             ),    
             GoRoute
             (
               path: '/login-token',
               name: 'login-token',
               builder: (context, state)
-               {
+              {
                 final token = state.uri.queryParameters['jwt'];
 
-                if (token != null) {
-                  try {
+                if (token != null) 
+                {
+                  try 
+                  {
                     Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
                     print("Decoded Token: $decodedToken");
                     final email = decodedToken['email'];  // Or 'sub' for subject, depending on your JWT claim
-                    if (email != null) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        ref.read(authNotifierProvider.notifier).login(email);
-      
-                        context.go('/blog');
-                      });
-                    } else {
+                    if (email != null) 
+                    {
+                      WidgetsBinding.instance.addPostFrameCallback
+                      (
+                        (_) 
+                        {
+                          ref.read(authNotifierProvider.notifier).login(email);     
+                          // Retrieve the 'from' query parameter
+                          final from = state.uri.queryParameters['from'];
+                          print("originated from $from");
+                          if (from != null) 
+                          {
+                            context.go(from); // Redirect to the original destination
+                          } 
+                          else 
+                          {
+                            context.go('/blog'); // Redirect to a default location after authentication
+                          }
+                        }
+                      );
+                    } 
+                    else 
+                    {
                       // Handle missing email claim in token.
+                      //In a production app, you'd want to use a proper logging mechanism instead of print.
                       print("Error: 'email' claim not found in JWT");
                       // Optionally redirect to an error page or login page.
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        context.go('/login'); // Or an error page
-                      });
+                      WidgetsBinding.instance.addPostFrameCallback
+                      (
+                        (_) 
+                        {
+                          context.go('/login'); // Or an error page
+                        }
+                      );
                     }
-                  } catch (e) {
+                  } 
+                  catch (e) 
+                  {
                     // Handle JWT decoding errors (invalid token, etc.)
                     print("Error decoding JWT: $e");
                     // Optionally redirect to an error page or login page.
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      context.go('/login'); // Or an error page
-                    });
+                    WidgetsBinding.instance.addPostFrameCallback
+                    (
+                      (_) 
+                      {
+                        context.go('/login'); // Or an error page
+                      }
+                    );
                   }
-                } else {
+                } 
+                else 
+                {
                   // Handle case where JWT is missing from the URL
                   print("Error: JWT missing from URL");
                   // Optionally redirect to the login page
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    context.go('/login');
-                  });
+                  WidgetsBinding.instance.addPostFrameCallback
+                  (
+                    (_) 
+                    {
+                      context.go('/login');
+                    }
+                  );
 
                 }
-                return Scaffold(
+                return Scaffold
+                (
                   body: Center(child: CircularProgressIndicator()), // Show loading indicator
                 );
               },
@@ -143,20 +197,19 @@ final routerProvider = Provider<GoRouter>
       redirect: (context, state) 
       {
         final isLoggedIn = authState.isLoggedIn;
-
-        final location = state.uri.toString();
-        //final isLoggingIn = state.uri.toString() == '/login';
-        debugPrint("-----location----: $location");
-        logger.d('here -- 0 --, isLoggedIn = $isLoggedIn location = $location fullPath = ${state.fullPath} matchedLocation = ${state.matchedLocation} path = ${state.path}');
+        final isLoginToken = state.uri.path == '/login-token';
+        final isLoggingIn = state.uri.path == '/login';
+        logger.d("redirect state.uri.path: ${state.uri.path}");
         
-        if (!isLoggedIn && location == '/blog')
+        if (!isLoggedIn && !isLoginToken && state.uri.path == '/blog') 
         {
-          return '/login';
+          return '/login?from=/blog';
         }
-        //if (isLoggedIn && location == '/login')
-        //{
-        //  return '/';
-        //}
+
+        if (isLoggedIn && isLoggingIn) 
+        {
+          return '/';
+        }
 
         // No redirection needed, allow navigation
         return null;

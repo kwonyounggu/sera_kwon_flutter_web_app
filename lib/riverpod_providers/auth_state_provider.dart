@@ -11,8 +11,8 @@ class AuthState
 
   AuthState copyWith({bool? isLoggedIn, String? userId}) 
   {
-    logger.i('isLoggedIn = $isLoggedIn, this.isLoggedIn = ${this.isLoggedIn}');
-    logger.i('userId = $userId, this.userId = ${this.userId}');
+    logger.i('isLoggedIn = $isLoggedIn, this.isLoggedIn = ${this.isLoggedIn} in AuthState copyWith({bool? isLoggedIn, String? userId})');
+    logger.i('userId = $userId, this.userId = ${this.userId} in AuthState copyWith({bool? isLoggedIn, String? userId})');
     return AuthState
     (
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
