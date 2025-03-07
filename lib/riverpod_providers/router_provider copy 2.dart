@@ -17,7 +17,6 @@ import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:googleapis/transcoder/v1.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:logger/logger.dart';
 import 'package:drkwon/errors/not_found_screen.dart';
@@ -82,43 +81,138 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()), 
             GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),  
   
-            GoRoute(path: '/login', name: 'login', builder: (context, state) => LoginScreen()),    
+            GoRoute
+            (
+              path: '/login',
+              name: 'login', // Named route
+              builder: (context, state)
+              {
+                return LoginScreen
+                (
+                  onLoginSuccess: (String email)
+                  { // Pass the email after login
+                    final whereFrom = state.uri.queryParameters['whereFrom'];
+                    if (whereFrom != null) 
+                    {
+                      context.go(whereFrom);
+                    } 
+                    else 
+                    {
+                      context.go('/');
+                    }
+                  },
+                  whereFrom: state.uri.queryParameters['whereFrom'] // Pass the whereFrom query parameters
+                );
+              }
+            ),    
+            GoRoute
+            (
+              path: '/login-token',
+              name: 'login-token',
+              builder: (context, state)
+              {
+                final token = state.uri.queryParameters['jwt'];
+
+                if (token != null) 
+                {
+                  try 
+                  {
+                    Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+                    print("Decoded Token: $decodedToken");
+                    final email = decodedToken['email'];  // Or 'sub' for subject, depending on your JWT claim
+                    if (email != null) 
+                    {
+                      WidgetsBinding.instance.addPostFrameCallback
+                      (
+                        (_) 
+                        {
+                          ref.read(authNotifierProvider.notifier).login(email);     
+                          // Retrieve the 'whereFrom' query parameter
+                          final whereFrom = state.uri.queryParameters['whereFrom'];
+                          print("originated from $whereFrom");
+                          if (whereFrom != null) 
+                          {
+                            context.go(whereFrom); // Redirect to the original destination
+                          } 
+                          else 
+                          {
+                            context.go('/blog'); // Redirect to a default location after authentication
+                          }
+                        }
+                      );
+                    } 
+                    else 
+                    {
+                      // Handle missing email claim in token.
+                      //In a production app, you'd want to use a proper logging mechanism instead of print.
+                      print("Error: 'email' claim not found in JWT");
+                      // Optionally redirect to an error page or login page.
+                      WidgetsBinding.instance.addPostFrameCallback
+                      (
+                        (_) 
+                        {
+                          context.go('/login'); // Or an error page
+                        }
+                      );
+                    }
+                  } 
+                  catch (e) 
+                  {
+                    // Handle JWT decoding errors (invalid token, etc.)
+                    print("Error decoding JWT: $e");
+                    // Optionally redirect to an error page or login page.
+                    WidgetsBinding.instance.addPostFrameCallback
+                    (
+                      (_) 
+                      {
+                        context.go('/login'); // Or an error page
+                      }
+                    );
+                  }
+                } 
+                else 
+                {
+                  // Handle case where JWT is missing from the URL
+                  print("Error: JWT missing from URL");
+                  // Optionally redirect to the login page
+                  WidgetsBinding.instance.addPostFrameCallback
+                  (
+                    (_) 
+                    {
+                      context.go('/login');
+                    }
+                  );
+
+                }
+                return Scaffold
+                (
+                  body: Center(child: CircularProgressIndicator()), // Show loading indicator
+                );
+              },
+            ),
+    
           ],
         ),
       ],
       redirect: (context, state) 
       {
         final isLoggedIn = authState.isLoggedIn;
-        //The following statement generate an error; 
-        //"Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt"
-        //final isLoggedIn = ref.read(authNotifierProvider).isLoggedIn;
+        final isLoginToken = state.uri.path == '/login-token';
         final isLoggingIn = state.uri.path == '/login';
-        logger.d("redirect state.uri.path: ${state.uri.path}, $isLoggedIn");
+        logger.d("redirect state.uri.path: ${state.uri.path}");
         
-        String? gotoRoute;
-
-        if (!isLoggedIn)
+        if (!isLoggedIn && !isLoginToken && state.uri.path == '/blog') 
         {
-          if (state.uri.path == '/blog') //cliked from /blog
-          {
-            gotoRoute = '/login?whereFrom=/blog';
-          }
-          else if (state.uri.path == '/blog2') 
-          {
-            gotoRoute = '/login?whereFrom=/blog2';
-          }
-          else //it may clicked login sign then remember where you were 
-          {
-
-          }
+          return '/login?whereFrom=/blog';
         }
-        else if (isLoggedIn && isLoggingIn) 
+
+        if (isLoggedIn && isLoggingIn) 
         {
-          gotoRoute = '/';
+          return '/';
         }
 
         // No redirection needed, allow navigation
-        return gotoRoute;
+        return null;
       },
       errorBuilder: (context, state) => const NotFoundScreen(), // Custom 404 page
     );
