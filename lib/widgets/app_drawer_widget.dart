@@ -109,7 +109,7 @@ class AppDrawerWidget extends ConsumerWidget
         image: DecorationImage
         (
           fit: BoxFit.cover,
-          image: ExactAssetImage('assets/images/logo.png'),
+          image: ExactAssetImage('assets/images/logo.jpg'),
         ),
       ),
       child: Container

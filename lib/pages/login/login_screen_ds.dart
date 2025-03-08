@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -51,86 +50,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     // Check if the fragment contains query parameters
     if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('whereFrom')) 
     {
-      // Split the fragment into path and query parameters
-      //String fragmentPath = fragment.split('?')[0]; //which is /login
-      String fragmentQuery = fragment.split('?')[1];
+        //String fragmentPath = fragment.split('?')[0]; //which is /login
+        String fragmentQuery = fragment.split('?')[1];
 
-      // Parse the query parameters from the fragment
-      Map<String, String> fragmentParams = Uri.splitQueryString(fragmentQuery);
+        // Parse the query parameters from the fragment
+        Map<String, String> fragmentParams = Uri.splitQueryString(fragmentQuery);
 
-      // Check if the fragment contains the whereFrom parameter
-      if (fragmentParams.containsKey('jwt') && fragmentParams.containsKey('whereFrom')) 
-      {
+        // Check if the fragment contains the whereFrom parameter
         String jwtToken = fragmentParams['jwt']!;
         if (jwtToken.isNotEmpty)
         {
-            try 
-            {
-              Map<String, dynamic> decodedToken = Jwt.parseJwt(jwtToken);
-              print("Decoded Token: $decodedToken");
-              final email = decodedToken['email'];  // Or 'sub' for subject, depending on your JWT claim
-              if (email != null) 
-              {
-                // Delay the provider modification until after the widget tree is built
-                Future.microtask(() {ref.read(authNotifierProvider.notifier).login(email);});   
-                /*WidgetsBinding.instance.addPostFrameCallback
-                (
-                  (_) 
-                  {
-                    // Retrieve the 'whereFrom' query parameter
-                    final String whereFrom = fragmentParams['whereFrom']!;
-                    print("originated from $whereFrom");
-                    switch (whereFrom) 
-                    {
-                      case '/blog': context.go('/blog'); break;
-                      default: context.go('/');
-                    }        
-                  }
-                );*/
-              } 
-              else 
-              {
-                // Handle missing email claim in token.
-                //In a production app, you'd want to use a proper logging mechanism instead of print.
-                print("Error: 'email' claim not found in JWT");
-                // Optionally redirect to an error page or login page.
-                WidgetsBinding.instance.addPostFrameCallback
-                (
-                  (_) 
-                  {
-                    context.go('/login'); // Or an error page
-                  }
-                );
-              }
-            } 
-            catch (e) 
-            {
-              // Handle JWT decoding errors (invalid token, etc.)
-              print("Error decoding JWT: $e");
-              // Optionally redirect to an error page or login page.
-              WidgetsBinding.instance.addPostFrameCallback
-              (
-                (_) 
-                {
-                  context.go('/login'); // Or an error page
-                }
-              );
-            }
+            Future.microtask(() {ref.read(authNotifierProvider.notifier).login(jwtToken);});              
         }
         else 
         {
-          // Handle case where JWT is missing from the URL
           print("Error: JWT missing from URL");
-          // Optionally redirect to the login page
-          WidgetsBinding.instance.addPostFrameCallback
-          (
-            (_) 
-            {
-              context.go('/login');
-            }
-          );
         }
-      }
+
     }
     setState
     (
@@ -237,43 +173,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   Widget build(BuildContext context) 
   {
-    return Consumer
-    (
-      builder: (context, ref, child) 
-      {
-        ref.listen<AuthState>
-        (
-          authNotifierProvider, 
-          (previous, next) 
-          {
-            if (next.isLoggedIn) 
-            {
-              // Retrieve the 'whereFrom' query parameter
-              final Uri currentUri = Uri.base;
-              String fragment = currentUri.fragment;
-
-              if (fragment.contains('?') && fragment.contains('whereFrom')) 
-              {
-                String fragmentQuery = fragment.split('?')[1];
-                Map<String, String> fragmentParams = Uri.splitQueryString(fragmentQuery);
-
-                if (fragmentParams.containsKey('whereFrom')) 
-                {
-                  final String whereFrom = fragmentParams['whereFrom']!;
-                  print("originated from $whereFrom");
-                  switch (whereFrom) 
-                  {
-                    case '/blog':
-                      context.go('/blog');
-                      break;
-                    default:
-                      context.go('/');
-                  }
-                }
-              }
-            }
-          }
-        );
         return Scaffold
         (
           appBar: AppBar
@@ -485,7 +384,5 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     ),
           ),
         );
-      }
-      );
-  }
+  } //build
 }
