@@ -7,6 +7,7 @@ class AuthState
   final bool isLoggedIn;
   final String? jwt;
   final String? userId;
+  final String? userEmail;
   final DateTime? expiryDate;
 
   AuthState
@@ -15,6 +16,7 @@ class AuthState
       required this.isLoggedIn,
       this.jwt,
       this.userId,
+      this.userEmail,
       this.expiryDate,
     }
   );
@@ -34,7 +36,8 @@ class AuthNotifier extends StateNotifier<AuthState>
     if (jwt != null) 
     {
       final decodedToken = JwtDecoder.decode(jwt);
-      final userId = decodedToken['sub'];
+      final userId = decodedToken['user_id'];
+      final userEmail = decodedToken['email'];
       final expiryDate = JwtDecoder.getExpirationDate(jwt);
 
       // Check if the token is expired
@@ -54,6 +57,7 @@ class AuthNotifier extends StateNotifier<AuthState>
           isLoggedIn: true,
           jwt: jwt,
           userId: userId,
+          userEmail: userEmail,
           expiryDate: expiryDate,
         );
       }
@@ -66,7 +70,10 @@ class AuthNotifier extends StateNotifier<AuthState>
     print("Decoded Token: $decodedToken");
 
     // Access specific claims
-    final userId = decodedToken['sub']; // 'sub' is a common claim for user ID
+    final userId = decodedToken['user_id']; // 'sub' is a common claim for user ID
+    print("User ID: $userId");
+
+    final userEmail = decodedToken['email']; // 'sub' is a common claim for user ID
     print("User ID: $userId");
 
     // Check expiration
@@ -85,6 +92,7 @@ class AuthNotifier extends StateNotifier<AuthState>
       isLoggedIn: true,
       jwt: jwt,
       userId: userId,
+      userEmail: userEmail,
       expiryDate: expiryDate,
     );
 
@@ -94,8 +102,11 @@ class AuthNotifier extends StateNotifier<AuthState>
 
   Future<void> logout() async 
   {
-    await _storage.delete(key: 'jwt');
-    state = AuthState(isLoggedIn: false);
+    if (state.isLoggedIn)
+    {
+      await _storage.delete(key: 'jwt');
+      state = AuthState(isLoggedIn: false);
+    }
   }
 
   void createAccount(String userId) 

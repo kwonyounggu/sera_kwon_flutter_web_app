@@ -193,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: Image.asset(
-                      'assets/google_logo.png', // Add your Google logo asset here
+                      'assets/images/google_logo.png', // Add your Google logo asset here
                       height: 24,
                     ),
                     label: Text('Continue with Google'),

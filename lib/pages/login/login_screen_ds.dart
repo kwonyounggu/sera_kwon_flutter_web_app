@@ -361,7 +361,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 (
                                   icon: Image.asset
                                   (
-                                    'images/google_logo.png', // Add your Google logo asset here
+                                    'assets/images/google_logo.png', // Add your Google logo asset here
                                     height: 24,
                                   ),
                                   label: Text('Continue with Google'),

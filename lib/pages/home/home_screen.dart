@@ -231,7 +231,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               _buildServiceCard('Retina', Icons.visibility),
               _buildServiceCard('Uveitis', Icons.healing),
               _buildServiceCard('Cosmetics', Icons.spa),
-              _buildServiceCard('LASIK', Icons.airline_seat_flat),
             ],
           ),
         ],
