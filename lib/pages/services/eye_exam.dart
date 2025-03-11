@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-class PinkEyeScreen extends ConsumerStatefulWidget 
+class EyeExamScreen extends ConsumerStatefulWidget 
 {
-  const PinkEyeScreen({super.key});
+  const EyeExamScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _PinkEyeScreenState createState() => _PinkEyeScreenState();
+  _EyeExamScreenState createState() => _EyeExamScreenState();
 }
 
-class _PinkEyeScreenState extends ConsumerState<PinkEyeScreen>
+class _EyeExamScreenState extends ConsumerState<EyeExamScreen>
 {
   @override
   Widget build(BuildContext context) 
@@ -21,7 +21,7 @@ class _PinkEyeScreenState extends ConsumerState<PinkEyeScreen>
     (
       body: const Center
       (
-        child: Text('Pink Eye Under construction.'),
+        child: Text('Comprehensive Eye exam  Under construction.'),
       ),
     );
   }

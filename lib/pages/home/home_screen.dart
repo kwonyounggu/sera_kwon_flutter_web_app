@@ -46,7 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             // About the Optometrist Section
             _buildAboutSection(jsonData['about_dr_kwon']),
             // Clinic Overview Section
-            _buildClinicOverviewSection(jsonData['about_our_clinic']),
+            //_buildClinicOverviewSection(jsonData['about_our_clinic']),
             SizedBox(height: 20),
             // Services Overview
             _buildServicesSection(),
@@ -101,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SizedBox(height: 20),
           Text
           (
-            'Comprehensive eye care services for cataracts, glaucoma, dry eyes, and more.',
+            'Comprehensive eye care services for cataracts, dry eyes, contact lens fitting and more.',
             style: TextStyle
             (
               fontSize: 18,
@@ -112,9 +112,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SizedBox(height: 20),
           ElevatedButton
           (
-            onPressed: () 
+            // ignore: dead_code
+            onPressed: true? null : () 
             {
-              // Navigate to appointment booking
               context.go('/book-an-appointment');
             },
             
@@ -147,7 +147,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           [
             Text
             (
-              'About Dr. S Kwon',
+              'About Optometrist Dr. S Kwon',
               style: TextStyle
               (
                 fontSize: 28,
@@ -166,6 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       );
   }
 
+  // ignore: unused_element
   Widget _buildClinicOverviewSection(List paragraphs) 
   {
     return Container
@@ -209,7 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         [
           Text
           (
-            'Our Major Services',
+            'Major Services',
             style: TextStyle
             (
               fontSize: 28,
@@ -225,12 +226,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             children: 
             [
               _buildServiceCard('Cataract', Icons.visibility_off),
-              _buildServiceCard('Cornea', Icons.remove_red_eye),
+              //_buildServiceCard('Cornea', Icons.remove_red_eye),
               _buildServiceCard('Dry Eye', Icons.water_drop),
-              _buildServiceCard('Glaucoma', Icons.health_and_safety),
-              _buildServiceCard('Retina', Icons.visibility),
-              _buildServiceCard('Uveitis', Icons.healing),
-              _buildServiceCard('Cosmetics', Icons.spa),
+              _buildServiceCard('Contact lens', Icons.healing),
+              _buildServiceCard('Eye Exam', Icons.visibility),
+              //_buildServiceCard('Uveitis', Icons.healing),
+              //_buildServiceCard('Cosmetics', Icons.spa),
             ],
           ),
         ],

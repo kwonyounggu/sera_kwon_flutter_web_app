@@ -24,7 +24,7 @@ class ContactScreen extends StatelessWidget
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dr. Jane Doe - Profile'),
+        title: Text('Optometrist Dr. S Kwon - Profile'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),

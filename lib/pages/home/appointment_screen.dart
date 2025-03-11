@@ -1,4 +1,4 @@
-import 'package:drkwon/utils/gmail_api_key.dart';
+//import 'package:drkwon/utils/gmail_api_key.dart';
 import 'package:drkwon/utils/google_email.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -103,7 +103,8 @@ class _AppointmentScreenState extends State<AppointmentScreen>
 
       final emailService = GoogleEmail
       (
-        serviceAccountJson: serviceAccountJson,
+        serviceAccountJson: 'Null', //temporary
+        //serviceAccountJson: serviceAccountJson,
         //senderEmail: "kwon.younggu@gmail.com"
         senderEmail: "gmail-api-sender@personal-eye-care-site.iam.gserviceaccount.com"
       );

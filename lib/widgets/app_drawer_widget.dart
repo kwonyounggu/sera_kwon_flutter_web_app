@@ -52,11 +52,11 @@ class AppDrawerWidget extends ConsumerWidget
                 children: <Widget>
                 [
                   for (MenuItem item in [MenuItem.cataracts, 
-                                        MenuItem.glaucoma, 
-                                        MenuItem.diabetic_retinopathy,
-                                        MenuItem.macular_degeneration,
-                                        MenuItem.lazy_eye,
-                                        MenuItem.pink_eye,
+                                        //MenuItem.glaucoma, 
+                                        //MenuItem.diabetic_retinopathy,
+                                        //MenuItem.macular_degeneration,
+                                        MenuItem.eye_exam,
+                                        MenuItem.contact_lens,
                                         MenuItem.dry_eyes,
                                         MenuItem.other_diseases
                                         ])

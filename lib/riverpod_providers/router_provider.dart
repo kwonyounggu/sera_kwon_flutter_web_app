@@ -3,13 +3,13 @@ import 'package:drkwon/pages/contact/contact.dart';
 import 'package:drkwon/pages/faq/faq.dart';
 import 'package:drkwon/pages/home/appointment_screen.dart';
 import 'package:drkwon/pages/services/cataracts.dart';
-import 'package:drkwon/pages/services/diabetic_retinopathy.dart';
+import 'package:drkwon/pages/services/contact_lens.dart';
+//import 'package:drkwon/pages/services/diabetic_retinopathy.dart';
 import 'package:drkwon/pages/services/dry_eyes.dart';
-import 'package:drkwon/pages/services/glaucoma.dart';
-import 'package:drkwon/pages/services/lazy_eye.dart';
-import 'package:drkwon/pages/services/macular_degeneration.dart';
+//import 'package:drkwon/pages/services/glaucoma.dart';
+//import 'package:drkwon/pages/services/macular_degeneration.dart';
 import 'package:drkwon/pages/services/other_diseases.dart';
-import 'package:drkwon/pages/services/pink_eye.dart';
+import 'package:drkwon/pages/services/eye_exam.dart';
 import 'package:drkwon/pages/settings/settings.dart';
 import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
@@ -50,21 +50,21 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/', name: 'home', builder: (context, state) => HomeScreen()),
           GoRoute(path: '/home', redirect: (context, state) => '/'),
           GoRoute(path: '/cataracts', name: 'cataracts', builder: (context, state) => CataractsScreen()),
-          GoRoute(path: '/glaucoma', name: 'glaucoma', builder: (context, state) => GlaucomaScreen()),
-          GoRoute(path: '/diabetic_retinopathy', name: 'diabetic_retinopathy', builder: (context, state) => DiabeticRetinopathyScreen()),
-          GoRoute(path: '/macular_degeneration', name: 'macular_degeneration', builder: (context, state) => MacularDegenerationScreen()),
-          GoRoute(path: '/lazy_eye', name: 'lazy_eye', builder: (context, state) => LazyEyeScreen()),
-          GoRoute(path: '/pink_eye', name: 'pink_eye', builder: (context, state) => PinkEyeScreen()),
+          //GoRoute(path: '/glaucoma', name: 'glaucoma', builder: (context, state) => GlaucomaScreen()),
+          //GoRoute(path: '/diabetic_retinopathy', name: 'diabetic_retinopathy', builder: (context, state) => DiabeticRetinopathyScreen()),
+          //GoRoute(path: '/macular_degeneration', name: 'macular_degeneration', builder: (context, state) => MacularDegenerationScreen()),
+          GoRoute(path: '/contact_lens', name: 'contact_lens', builder: (context, state) => ContactLensScreen()),
+          GoRoute(path: '/eye_exam', name: 'eye_exam', builder: (context, state) => EyeExamScreen()),
           GoRoute(path: '/dry_eyes', name: 'dry_eyes', builder: (context, state) => DryEyesScreen()),
           GoRoute(path: '/other_diseases', name: 'other_diseases', builder: (context, state) => OtherDiseasesScreen()),
-          GoRoute(path: '/blog', name: 'blog', builder: (context, state) => BlogScreen()),
+          //GoRoute(path: '/blog', name: 'blog', builder: (context, state) => BlogScreen()),
           GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
           GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
           GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
           GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileScreen()),
           GoRoute(path: '/settings', name: 'settings', builder: (context, state) => SettingsScreen()),
-          GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()),
-          GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),
+          //GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()),
+          //GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),
           GoRoute(path: '/login', name: 'login', builder: (context, state) => LoginScreen()),
         ],
       ),

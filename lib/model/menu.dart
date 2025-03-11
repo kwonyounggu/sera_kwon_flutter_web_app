@@ -11,9 +11,9 @@ enum MenuItem
   // ignore: constant_identifier_names
   macular_degeneration,
   // ignore: constant_identifier_names
-  lazy_eye,
+  contact_lens,
   // ignore: constant_identifier_names
-  pink_eye,
+  eye_exam,
   // ignore: constant_identifier_names
   dry_eyes,
   // ignore: constant_identifier_names
@@ -44,8 +44,8 @@ final Map<MenuItem, DrawerItem> drawerItems =
   MenuItem.glaucoma: DrawerItem('Glaucoma', Icons.person, '/glaucoma', 'glaucoma'),
   MenuItem.diabetic_retinopathy: DrawerItem('Diabetic retinopathy', Icons.person, '/diabetic_retinopathy', 'diabetic_retinopathy'),
   MenuItem.macular_degeneration: DrawerItem('Macular degeneration', Icons.person, '/macular_degeneration', 'macular_degeneration'),
-  MenuItem.lazy_eye: DrawerItem('Lazy eye', Icons.person, '/lazy_eye', 'lazy_eye'),
-  MenuItem.pink_eye: DrawerItem('Pink eye', Icons.person, '/pink_eye', 'pink_eye'),
+  MenuItem.contact_lens: DrawerItem('Contact lens', Icons.person, '/contact_lens', 'contact_lens'),
+  MenuItem.eye_exam: DrawerItem('Eye exam', Icons.person, '/eye_exam', 'eye_exam'),
   MenuItem.dry_eyes: DrawerItem('Dry eyes', Icons.person, '/dry_eyes', 'dry_eyes'),
   MenuItem.other_diseases: DrawerItem('Other diseases', Icons.person, '/other_diseases', 'other_diseases'),
   MenuItem.blog: DrawerItem('Blog', Icons.person, '/blog', 'blog'),

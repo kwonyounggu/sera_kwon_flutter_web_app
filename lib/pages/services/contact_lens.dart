@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-class LazyEyeScreen extends ConsumerStatefulWidget 
+class ContactLensScreen extends ConsumerStatefulWidget 
 {
-  const LazyEyeScreen({super.key});
+  const ContactLensScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _LazyEyeScreenState createState() => _LazyEyeScreenState();
+  _ContactLensScreenState createState() => _ContactLensScreenState();
 }
 
-class _LazyEyeScreenState extends ConsumerState<LazyEyeScreen>
+class _ContactLensScreenState extends ConsumerState<ContactLensScreen>
 {
   @override
   Widget build(BuildContext context) 
@@ -21,7 +21,7 @@ class _LazyEyeScreenState extends ConsumerState<LazyEyeScreen>
     (
       body: const Center
       (
-        child: Text('Lazy Eye Under construction.'),
+        child: Text('Contact Lens Under construction.'),
       ),
     );
   }
