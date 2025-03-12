@@ -6,7 +6,7 @@ class AuthState
 {
   final bool isLoggedIn;
   final String? jwt;
-  final String? userId;
+  final int? userId;
   final String? userEmail;
   final DateTime? expiryDate;
 
@@ -64,7 +64,7 @@ class AuthNotifier extends StateNotifier<AuthState>
     }
   }
   //avoid async to make it synchronized
-  void login(String jwt)
+  void login(String jwt, String refreshToken)
   {
     final decodedToken = JwtDecoder.decode(jwt);
     print("Decoded Token: $decodedToken");
@@ -74,7 +74,7 @@ class AuthNotifier extends StateNotifier<AuthState>
     print("User ID: $userId");
 
     final userEmail = decodedToken['email']; // 'sub' is a common claim for user ID
-    print("User ID: $userId");
+    print("User Email: $userEmail");
 
     // Check expiration
     final isExpired = JwtDecoder.isExpired(jwt);
@@ -90,7 +90,7 @@ class AuthNotifier extends StateNotifier<AuthState>
     state = AuthState
     (
       isLoggedIn: true,
-      jwt: jwt,
+      jwt: jwt, //------- remove later ? --------
       userId: userId,
       userEmail: userEmail,
       expiryDate: expiryDate,
@@ -98,13 +98,15 @@ class AuthNotifier extends StateNotifier<AuthState>
 
     // Store token in secure storage
     _storage.write(key: 'jwt', value: jwt);
+    _storage.write(key: 'refresh_token', value: refreshToken);
   }
 
   Future<void> logout() async 
   {
     if (state.isLoggedIn)
     {
-      await _storage.delete(key: 'jwt');
+      await _storage.delete(key: 'jwt');//access_token
+      await _storage.delete(key: 'refresh_token');
       state = AuthState(isLoggedIn: false);
     }
   }

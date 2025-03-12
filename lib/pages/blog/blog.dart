@@ -1,9 +1,10 @@
-import 'package:drkwon/pages/dashboard/models/blog_post.dart';
-import 'package:drkwon/pages/dashboard/services/api_service.dart';
+import 'package:drkwon/pages/blog/models/blog_post.dart';
+import 'package:drkwon/pages/blog/services/api_service.dart';
 import 'package:flutter/material.dart';
 
 
-class BlogScreen extends StatefulWidget {
+class BlogScreen extends StatefulWidget 
+{
   const BlogScreen({super.key});
 
   @override
@@ -11,26 +12,37 @@ class BlogScreen extends StatefulWidget {
   _BlogPageState createState() => _BlogPageState();
 }
 
-class _BlogPageState extends State<BlogScreen> {
+class _BlogPageState extends State<BlogScreen> 
+{
   final ApiService _apiService = ApiService();
   List<BlogPost> _blogPosts = [];
   bool _isLoading = false;
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     _loadBlogPosts();
   }
 
-  Future<void> _loadBlogPosts() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _loadBlogPosts() async 
+  {
+    setState
+    (
+      () 
+      {
+        _isLoading = true;
+      }
+    );
     final blogPosts = await _apiService.getBlogPosts();
-    setState(() {
-      _blogPosts = blogPosts;
-      _isLoading = false;
-    });
+    setState
+    (
+      () 
+      {
+        _blogPosts = blogPosts;
+        _isLoading = false;
+      }
+    );
   }
 
   @override

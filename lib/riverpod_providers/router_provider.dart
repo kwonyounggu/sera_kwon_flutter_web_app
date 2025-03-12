@@ -15,6 +15,7 @@ import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:googleapis/civicinfo/v2.dart';
 import 'package:logger/logger.dart';
 import 'package:drkwon/errors/not_found_screen.dart';
 import 'package:drkwon/pages/home/home_screen.dart';
@@ -57,7 +58,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/eye_exam', name: 'eye_exam', builder: (context, state) => EyeExamScreen()),
           GoRoute(path: '/dry_eyes', name: 'dry_eyes', builder: (context, state) => DryEyesScreen()),
           GoRoute(path: '/other_diseases', name: 'other_diseases', builder: (context, state) => OtherDiseasesScreen()),
-          //GoRoute(path: '/blog', name: 'blog', builder: (context, state) => BlogScreen()),
+          GoRoute(path: '/blog', name: 'blog', builder: (context, state) => BlogScreen()),
           GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
           GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
           GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
@@ -83,10 +84,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         final String? jwt = state.uri.queryParameters["jwt"];
         final String? whereFrom = state.uri.queryParameters["whereFrom"];
 
+        print("jwt=$jwt, whereFrom=$whereFrom");
         if (isLoggingIn && jwt != null && whereFrom != null)
         {
           gotoRoute = whereFrom;
         }
+        //there were some errors like in auth_state_provider.dart while writting jwt token
+        //so just route to home temporary
+        //else {return null;} 
+        //{
+        //  gotoRoute = '/';
+        //}
         //No else is allowed (eg: isLoggedIn && /logout)
       }
       else //not logged in yet
