@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:drkwon/utils/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:http/http.dart' as http;
 
 class AuthState 
 {
@@ -24,44 +29,50 @@ class AuthState
 class AuthNotifier extends StateNotifier<AuthState> 
 {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+  Timer? tokenRefreshTimer;
 
   AuthNotifier() : super(AuthState(isLoggedIn: false)) 
   {
+    print("AuthNotifier, _loadToken is called");
     _loadToken();
   }
 
   Future<void> _loadToken() async 
   {
     final jwt = await _storage.read(key: 'jwt');
+    final refreshToken = await _storage.read(key: 'refresh_token');
+
     if (jwt != null) 
     {
-      final decodedToken = JwtDecoder.decode(jwt);
-      final userId = decodedToken['user_id'];
-      final userEmail = decodedToken['email'];
-      final expiryDate = JwtDecoder.getExpirationDate(jwt);
-
-      // Check if the token is expired
       final isExpired = JwtDecoder.isExpired(jwt);
-
-      if (isExpired) 
+      if (isExpired && refreshToken != null) 
       {
-        // Token is expired, log the user out
-        await _storage.delete(key: 'jwt'); // Clear the expired token
-        state = AuthState(isLoggedIn: false);
+        await refreshAccessToken(refreshToken); // Try refreshing
       } 
-      else 
+      else if (!isExpired) 
       {
-        // Token is valid, update the state
-        state = AuthState
-        (
-          isLoggedIn: true,
-          jwt: jwt,
-          userId: userId,
-          userEmail: userEmail,
-          expiryDate: expiryDate,
-        );
+        _updateStateFromToken(jwt);
+      } 
+      else //isExpired
+      {
+        await _storage.delete(key: 'jwt'); // Clear invalid token
+        state = AuthState(isLoggedIn: false);
       }
     }
+  }
+
+  void _updateStateFromToken(String jwt) 
+  {
+    final decodedToken = JwtDecoder.decode(jwt);
+
+    state = AuthState
+    (
+      isLoggedIn: true,
+      jwt: jwt,
+      userId: decodedToken['user_id'],
+      userEmail: decodedToken['email'],
+      expiryDate: JwtDecoder.getExpirationDate(jwt),
+    );
   }
   //avoid async to make it synchronized
   void login(String jwt, String refreshToken)
@@ -99,14 +110,21 @@ class AuthNotifier extends StateNotifier<AuthState>
     // Store token in secure storage
     _storage.write(key: 'jwt', value: jwt);
     _storage.write(key: 'refresh_token', value: refreshToken);
+
+    // Start the refresh timer
+    startTokenRefreshTimer();
   }
 
   Future<void> logout() async 
   {
     if (state.isLoggedIn)
     {
+      // Stop the refresh timer
+      tokenRefreshTimer?.cancel();
+
       await _storage.delete(key: 'jwt');//access_token
       await _storage.delete(key: 'refresh_token');
+
       state = AuthState(isLoggedIn: false);
     }
   }
@@ -115,6 +133,98 @@ class AuthNotifier extends StateNotifier<AuthState>
   {
     //state = state.copyWith(isLoggedIn: true, userId: userId);
   }
+
+  void startTokenRefreshTimer() 
+  {
+    tokenRefreshTimer = Timer.periodic
+    (
+      Duration(minutes: 2), //14
+      (timer) async 
+      {
+        final refreshToken = await _storage.read(key: 'refresh_token');
+        if (refreshToken != null) 
+        {
+          await refreshAccessToken(refreshToken);
+        } 
+        else 
+        {
+          timer.cancel();
+        }
+      },
+    );
+  }
+
+
+  Future<void> refreshAccessToken(String refreshToken) async 
+  {
+    try 
+    {
+      final response = await http.post
+      (
+        Uri.parse('$FASTAPI_URL/refresh'),
+        headers: 
+        {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'refresh_token': refreshToken}),
+        //the following is less secure, because tokens could appear in server logs or network traces.
+        //Uri.parse('$FASTAPI_URL/refresh?refresh_token=$refreshToken'),
+      );
+
+      if (response.statusCode == 200) 
+      {
+        final newAccessToken = json.decode(response.body)['access_token'];
+        await _storage.write(key: 'jwt', value: newAccessToken);
+        _updateStateFromToken(newAccessToken);
+      } 
+      else 
+      {
+        tokenRefreshTimer?.cancel();
+        print("Refresh token failed or expired. User needs to log in again.");
+        //_showSessionExpiredDialog
+        logout();
+      }
+    } 
+    catch (e) 
+    {
+      print("Token refresh error: $e");
+    }
+  }
+
+  /*
+  //To implement
+  //see at the bottom of https://chatgpt.com/c/67cdefdb-55b0-800a-ab98-544e875de6e2
+  void _showSessionExpiredDialog() 
+  {
+    WidgetsBinding.instance.addPostFrameCallback
+    (
+      (_) 
+      {
+        showDialog
+        (
+          context: context,
+          builder: (context) => AlertDialog
+          (
+            title: const Text("Session Expired"),
+            content: const Text("Your session has expired. Please log in again."),
+            actions: 
+            [
+              TextButton
+              (
+                onPressed: () 
+                {
+                  Navigator.of(context).pop();
+                  logout(); // Clear state and tokens
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  } 
+  */
 }
 
 // Create a Provider for AuthNotifier

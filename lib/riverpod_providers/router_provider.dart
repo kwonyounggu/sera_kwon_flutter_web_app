@@ -1,4 +1,5 @@
 import 'package:drkwon/pages/blog/blog.dart';
+import 'package:drkwon/pages/blog/public_blog_listing.dart';
 import 'package:drkwon/pages/contact/contact.dart';
 import 'package:drkwon/pages/faq/faq.dart';
 import 'package:drkwon/pages/home/appointment_screen.dart';
@@ -58,7 +59,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/eye_exam', name: 'eye_exam', builder: (context, state) => EyeExamScreen()),
           GoRoute(path: '/dry_eyes', name: 'dry_eyes', builder: (context, state) => DryEyesScreen()),
           GoRoute(path: '/other_diseases', name: 'other_diseases', builder: (context, state) => OtherDiseasesScreen()),
-          GoRoute(path: '/blog', name: 'blog', builder: (context, state) => BlogScreen()),
+          GoRoute(path: '/blog', name: 'blog', builder: (context, state) => PublicBlogListing()),
           GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
           GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
           GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
@@ -102,7 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (state.uri.path == '/blog') 
         {
 
-          gotoRoute = '/login?whereFrom=/blog';
+          //gotoRoute = '/login?whereFrom=/blog';
         } 
         else if (state.uri.path == '/blog2') 
         {

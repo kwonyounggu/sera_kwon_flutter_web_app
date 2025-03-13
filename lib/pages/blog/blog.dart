@@ -22,7 +22,7 @@ class _BlogPageState extends State<BlogScreen>
   void initState() 
   {
     super.initState();
-    _loadBlogPosts();
+    //_loadBlogPosts();
   }
 
   Future<void> _loadBlogPosts() async 
@@ -39,12 +39,13 @@ class _BlogPageState extends State<BlogScreen>
     (
       () 
       {
-        _blogPosts = blogPosts;
+        //_blogPosts = blogPosts;
         _isLoading = false;
       }
     );
   }
 
+  /*
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +62,20 @@ class _BlogPageState extends State<BlogScreen>
                 return BlogPostCard(blogPost: _blogPosts[index]);
               },
             ),
+    );
+  }*/
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Blog'),
+      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Text('under construction')
     );
   }
 }

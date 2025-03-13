@@ -48,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     String fragment = currentUri.fragment;
 
     // Check if the fragment contains query parameters
-    if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('refresh_token') && fragment.contains('whereFrom')) 
+    if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('refresh') && fragment.contains('whereFrom')) 
     {
         //String fragmentPath = fragment.split('?')[0]; //which is /login
         String fragmentQuery = fragment.split('?')[1];
@@ -58,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
         // Check if the fragment contains the whereFrom parameter
         String jwtToken = fragmentParams['jwt']!;
-        String refreshToken = fragmentParams['refresh_token']!;
+        String refreshToken = fragmentParams['refresh']!;
         if (jwtToken.isNotEmpty)
         {
             Future.microtask(() {ref.read(authNotifierProvider.notifier).login(jwtToken, refreshToken);});              

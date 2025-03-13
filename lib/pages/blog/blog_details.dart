@@ -1,17 +1,22 @@
+import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class BlogDetailPage extends StatefulWidget {
+class BlogDetailPage extends ConsumerStatefulWidget 
+{
   final int blogId;
 
-  BlogDetailPage({required this.blogId});
+  const BlogDetailPage({super.key, required this.blogId});
 
   @override
+  // ignore: library_private_types_in_public_api
   _BlogDetailPageState createState() => _BlogDetailPageState();
 }
 
-class _BlogDetailPageState extends State<BlogDetailPage> {
+class _BlogDetailPageState extends ConsumerState<BlogDetailPage> 
+{
   dynamic _blog;
   List<dynamic> _comments = [];
 
@@ -23,7 +28,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   }
 
   Future<void> fetchBlog() async {
-    final response = await http.get(Uri.parse('YOUR_FASTAPI_URL/blogs/${widget.blogId}')); // Replace with your FastAPI endpoint
+    final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}')); // Replace with your FastAPI endpoint
 
     if (response.statusCode == 200) {
       setState(() {
@@ -35,7 +40,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   }
 
   Future<void> fetchComments() async {
-      final response = await http.get(Uri.parse('YOUR_FASTAPI_URL/blogs/${widget.blogId}/comments')); // Replace with your FastAPI endpoint
+      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments')); // Replace with your FastAPI endpoint
 
     if (response.statusCode == 200) {
       setState(() {
