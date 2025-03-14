@@ -52,9 +52,6 @@ class AppDrawerWidget extends ConsumerWidget
                 children: <Widget>
                 [
                   for (MenuItem item in [MenuItem.cataracts, 
-                                        //MenuItem.glaucoma, 
-                                        //MenuItem.diabetic_retinopathy,
-                                        //MenuItem.macular_degeneration,
                                         MenuItem.eye_exam,
                                         MenuItem.contact_lens,
                                         MenuItem.dry_eyes,
@@ -63,7 +60,35 @@ class AppDrawerWidget extends ConsumerWidget
                     buildMenuItem(context, ref, item, fontSize),
                 ],
               ),
-              for (MenuItem item in [MenuItem.blog, 
+              ExpansionTile
+              (
+                leading: Icon(drawerItems[MenuItem.blogs]!.icon),
+                title: AutoSizeText
+                (
+                  drawerItems[MenuItem.blogs]!.title,
+                  minFontSize: 16,
+                  maxFontSize: 18,
+                  style: TextStyle(fontSize: fontSize),
+                  maxLines: 2,
+                ),
+                /*initiallyExpanded: _isServicesExpanded,
+                onExpansionChanged: (expanded) 
+                {
+                  setState(() 
+                  {
+                    _isServicesExpanded = expanded;
+                  });
+                },*/
+                childrenPadding: EdgeInsets.only(left:20),
+                children: <Widget>
+                [
+                  for (MenuItem item in [MenuItem.blog_list, 
+                                        MenuItem.blog_writing,
+                                        ])
+                    buildMenuItem(context, ref, item, fontSize),
+                ],
+              ),
+              for (MenuItem item in [
                                     MenuItem.faq, 
                                     MenuItem.contact,
                                     MenuItem.settings,
