@@ -91,10 +91,36 @@ class AppDrawerWidget extends ConsumerWidget
               for (MenuItem item in [
                                     MenuItem.faq, 
                                     MenuItem.contact,
-                                    MenuItem.settings,
-                                    MenuItem.profile,
                                     ])
                   buildMenuItem(context, ref, item, fontSize),
+
+              ExpansionTile
+              (
+                leading: Icon(drawerItems[MenuItem.settings]!.icon),
+                title: AutoSizeText
+                (
+                  drawerItems[MenuItem.settings]!.title,
+                  minFontSize: 16,
+                  maxFontSize: 18,
+                  style: TextStyle(fontSize: fontSize),
+                  maxLines: 2,
+                ),
+                /*initiallyExpanded: _isServicesExpanded,
+                onExpansionChanged: (expanded) 
+                {
+                  setState(() 
+                  {
+                    _isServicesExpanded = expanded;
+                  });
+                },*/
+                childrenPadding: EdgeInsets.only(left:20),
+                children: <Widget>
+                [
+                  for (MenuItem item in [MenuItem.profile, 
+                                        ])
+                    buildMenuItem(context, ref, item, fontSize),
+                ],
+              ),
             ]
           )
         ),

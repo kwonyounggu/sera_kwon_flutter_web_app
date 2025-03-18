@@ -24,6 +24,7 @@ enum MenuItem
   faq,
   contact,
   settings,
+  aboutme,
   profile,
   logout,
 }
@@ -55,7 +56,8 @@ final Map<MenuItem, DrawerItem> drawerItems =
   MenuItem.blog_writing: DrawerItem('Write A Blog', Icons.person, '/blog_writing', 'blog_writing'),
   MenuItem.faq: DrawerItem('FAQ', Icons.person, '/faq', 'faq'),
   MenuItem.contact: DrawerItem('Contact', Icons.person, '/contact', 'contact'),
-  MenuItem.settings: DrawerItem('Settings', Icons.person, '/settings', 'settings'),
+  MenuItem.settings: DrawerItem('My Settings', Icons.person, '/settings', 'settings'),
   MenuItem.profile: DrawerItem('Profile', Icons.settings, '/profile', 'profile'),
+  MenuItem.aboutme: DrawerItem('AboutMe', Icons.account_box, '/aboutme', 'aboutme'),
   MenuItem.logout: DrawerItem('Logout', Icons.exit_to_app, '/logout', 'logout'),
 };

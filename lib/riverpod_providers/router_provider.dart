@@ -12,7 +12,8 @@ import 'package:drkwon/pages/services/dry_eyes.dart';
 //import 'package:drkwon/pages/services/macular_degeneration.dart';
 import 'package:drkwon/pages/services/other_diseases.dart';
 import 'package:drkwon/pages/services/eye_exam.dart';
-import 'package:drkwon/pages/settings/settings.dart';
+import 'package:drkwon/pages/settings/my_profile.dart';
+//import 'package:drkwon/pages/settings/settings.dart';
 import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ import 'package:drkwon/errors/not_found_screen.dart';
 import 'package:drkwon/pages/home/home_screen.dart';
 import 'package:drkwon/pages/login/create_account_screen.dart';
 import 'package:drkwon/pages/login/login_screen_ds.dart';
-import 'package:drkwon/pages/about/profile_screen.dart';
+//import 'package:drkwon/pages/about/profile_screen.dart';
 //import 'package:drkwon/pages/state_data_down_up/color_mixer_screen.dart';
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 
@@ -75,8 +76,8 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
             GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
             GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
-            GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileScreen()),
-            GoRoute(path: '/settings', name: 'settings', builder: (context, state) => SettingsScreen()),
+            GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileSetupScreen()),
+            //GoRoute(path: '/settings', name: 'settings', builder: (context, state) => SettingsScreen()),
             //GoRoute(path: '/color-mixer', name: 'color_mixer', builder: (context, state) => ColorMixerScreen()),
             //GoRoute(path: '/book-an-appointment', name: 'book_an_appointment', builder: (context, state) => AppointmentScreen()),
             GoRoute(path: '/login', name: 'login', builder: (context, state) => LoginScreen()),
