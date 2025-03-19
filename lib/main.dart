@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drkwon/riverpod_providers/router_provider.dart';
+import 'package:flutter_quill/flutter_quill.dart'; // Import FlutterQuill
+import 'package:flutter_localizations/flutter_localizations.dart'; // Import localization
 
 void main() 
 {
@@ -27,6 +29,16 @@ class MyApp extends ConsumerWidget
         fontFamily: 'Roboto',
       ),
       scrollBehavior: CustomScrollBehavior(),
+      localizationsDelegates: const [
+        FlutterQuillLocalizations.delegate, // Add this delegate
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const <Locale>[
+        Locale('en', 'US'), // English, US
+        // Add other locales as needed
+      ],
     );
   }
 }
