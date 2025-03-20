@@ -11,6 +11,7 @@ dependencies:
   file_picker: ^9.2.1
   flutter:
     sdk: flutter
+  flutter_html: ^3.0.0
   flutter_markdown: ^0.7.6+2
   flutter_quill: ^11.1.0
   flutter_quill_extensions: ^11.0.0
@@ -29,6 +30,7 @@ dependencies:
   shared_preferences: ^2.5.2
   url_launcher: ^6.3.1
   video_player: ^2.9.3
+  vsc_quill_delta_to_html: ^1.0.5
 
 dev_dependencies:
   flutter_test:

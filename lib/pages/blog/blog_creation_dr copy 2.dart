@@ -5,15 +5,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-//import 'package:file_picker/file_picker.dart';
-import 'package:flutter_html/flutter_html.dart'; // Add flutter_html
-import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:file_picker/file_picker.dart';
 
 class BlogCreationPage extends ConsumerStatefulWidget {
   const BlogCreationPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _BlogCreationPageState createState() => _BlogCreationPageState();
 }
 
@@ -25,7 +22,6 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
   final ScrollController _scrollController = ScrollController();
   String _visibility = 'Public';
   bool _isLoading = false;
-  bool _isPreview = false; // Add preview state
 
   Future<void> createBlog() async {
     if (_formKey.currentState!.validate()) {
@@ -54,16 +50,6 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
     }
   }
 
-  String _getHtmlFromDelta() {
-  final delta = _quillController.document.toDelta();
-  final converter = QuillDeltaToHtmlConverter(
-    delta.toJson(),
-    ConverterOptions.forEmail(),
-  );
-  final html = converter.convert();
-  return html;
-}
-
   @override
   void dispose() {
     _quillController.dispose();
@@ -74,25 +60,11 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _isPreview ? _buildPreviewPage() : _buildEditorPage();
-  }
-
-  Widget _buildEditorPage() {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create New Blog Post'),
         centerTitle: true,
         elevation: 0,
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _isPreview = true;
-              });
-            },
-            child: const Text('Preview'),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -128,34 +100,23 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Column
-                            (
-                              children: 
-                              [
-                                QuillSimpleToolbar
-                                (
-                                  controller: _quillController,
-                                  config: QuillSimpleToolbarConfig
-                                  (
-                                    embedButtons: FlutterQuillEmbeds.toolbarButtons(videoButtonOptions: null),
+                            child: Column(
+                              children: [
+                                QuillSimpleToolbar(
+                                  controller: _quillController, // Correct placement
+                                  config: QuillSimpleToolbarConfig(
+                                    embedButtons: FlutterQuillEmbeds.toolbarButtons(),
                                   ),
                                 ),
-                                Expanded
-                                (
-                                  child: Padding
-                                  (
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: QuillEditor.basic
-                                    (
-                                      controller: _quillController,
-                                      config: QuillEditorConfig
-                                      (
-                                        embedBuilders: kIsWeb
+                                Expanded(
+                                  child: QuillEditor.basic(
+                                    controller: _quillController, // Correct placement
+                                    config: QuillEditorConfig(
+                                      embedBuilders: kIsWeb
                                           ? FlutterQuillEmbeds.editorWebBuilders()
                                           : FlutterQuillEmbeds.editorBuilders(),
-                                      ),
                                     ),
-                                  )
+                                  ),
                                 ),
                               ],
                             ),
@@ -165,36 +126,6 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
                     ),
                   ),
                 ),
-              ),
-                            const SizedBox(height: 20),
-              // Segmented Buttons for Visibility
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Visibility',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  SegmentedButton<String>(
-                    segments: const <ButtonSegment<String>>[
-                      ButtonSegment<String>(
-                        value: 'Public',
-                        label: Text('Public'),
-                      ),
-                      ButtonSegment<String>(
-                        value: 'Doctors Only',
-                        label: Text('Doctors Only'),
-                      ),
-                    ],
-                    selected: <String>{_visibility},
-                    onSelectionChanged: (Set<String> newSelection) {
-                      setState(() {
-                        _visibility = newSelection.first;
-                      });
-                    },
-                  ),
-                ],
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -207,49 +138,6 @@ class _BlogCreationPageState extends ConsumerState<BlogCreationPage> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPreviewPage() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Blog Preview'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _isPreview = false;
-              });
-            },
-            child: const Text('Edit'),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _titleController.text,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Html(data: _getHtmlFromDelta()),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : createBlog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey[900],
-                padding: const EdgeInsets.symmetric(vertical: 15),
-              ),
-              child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Publish Blog', style: TextStyle(fontSize: 16)),
-            ),
-          ],
         ),
       ),
     );
