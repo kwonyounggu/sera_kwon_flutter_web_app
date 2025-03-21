@@ -83,9 +83,10 @@ class AppDrawerWidget extends ConsumerWidget
                 children: <Widget>
                 [
                   for (MenuItem item in [MenuItem.blog_list, 
-                                        MenuItem.blog_writing,
+                                        //MenuItem.blog_writing,
                                         ])
                     buildMenuItem(context, ref, item, fontSize),
+                  buildMenuItemDisabled(context, ref, MenuItem.blog_writing, fontSize),
                 ],
               ),
               for (MenuItem item in [
@@ -148,6 +149,24 @@ class AppDrawerWidget extends ConsumerWidget
         if (isMobile) Navigator.pop(context);
         context.go(drawerItems[item]!.routingPath);
       },
+    );
+  }
+
+  Widget buildMenuItemDisabled(BuildContext context, WidgetRef ref,  MenuItem item, double fontSize) 
+  {
+    return ListTile
+    (
+      leading: Icon(drawerItems[item]!.icon, color: Colors.grey,),
+      title: AutoSizeText
+      (
+        drawerItems[item]!.title,
+        minFontSize: 16,
+        maxFontSize: 18,
+        style: TextStyle(fontSize: fontSize, color: Colors.grey),
+        maxLines: 2,
+      ),
+      selected: false,
+      onTap: null
     );
   }
 
