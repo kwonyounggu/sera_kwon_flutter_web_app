@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:drkwon/model/menu.dart';
+import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ class AppDrawerWidget extends ConsumerWidget
   @override
   Widget build(BuildContext context, WidgetRef ref) 
   {
+    final authState = ref.watch(authNotifierProvider);
     final fontSize = MediaQuery.of(context).size.width * 0.025;
 
     return Column
@@ -95,37 +97,52 @@ class AppDrawerWidget extends ConsumerWidget
                                     ])
                   buildMenuItem(context, ref, item, fontSize),
 
-              ExpansionTile
-              (
-                leading: Icon(drawerItems[MenuItem.settings]!.icon),
-                title: AutoSizeText
+              authState.isLoggedIn?
+                ExpansionTile
                 (
-                  drawerItems[MenuItem.settings]!.title,
-                  minFontSize: 16,
-                  maxFontSize: 18,
-                  style: TextStyle(fontSize: fontSize),
-                  maxLines: 2,
-                ),
-                /*initiallyExpanded: _isServicesExpanded,
-                onExpansionChanged: (expanded) 
-                {
-                  setState(() 
+                  leading: Icon(drawerItems[MenuItem.settings]!.icon),
+                  title: AutoSizeText
+                  (
+                    drawerItems[MenuItem.settings]!.title,
+                    minFontSize: 16,
+                    maxFontSize: 18,
+                    style: TextStyle(fontSize: fontSize),
+                    maxLines: 2,
+                  ),
+                  /*initiallyExpanded: _isServicesExpanded,
+                  onExpansionChanged: (expanded) 
                   {
-                    _isServicesExpanded = expanded;
-                  });
-                },*/
-                childrenPadding: EdgeInsets.only(left:20),
-                children: <Widget>
-                [
-                  for (MenuItem item in [MenuItem.profile, 
-                                        ])
-                    buildMenuItem(context, ref, item, fontSize),
-                ],
-              ),
+                    setState(() 
+                    {
+                      _isServicesExpanded = expanded;
+                    });
+                  },*/
+                  childrenPadding: EdgeInsets.only(left:20),
+                  children: <Widget>
+                  [
+                    for (MenuItem item in [MenuItem.profile, 
+                                          ])
+                      buildMenuItem(context, ref, item, fontSize),
+                  ],
+                ):
+                ListTile
+                (
+                  leading: Icon(drawerItems[MenuItem.settings]!.icon, color: Colors.grey,),
+                  title: AutoSizeText
+                  (
+                    drawerItems[MenuItem.settings]!.title,
+                    minFontSize: 16,
+                    maxFontSize: 18,
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey),
+                    maxLines: 2,
+                  ),
+                  selected: false,
+                  onTap: null
+                ),
             ]
           )
         ),
-        buildMenuItem(context, ref, MenuItem.logout, fontSize)
+        if (authState.isLoggedIn) buildMenuItem(context, ref, MenuItem.logout, fontSize)
       ]
     );
   }
