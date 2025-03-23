@@ -48,7 +48,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     String fragment = currentUri.fragment;
 
     // Check if the fragment contains query parameters
-    if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('refresh') && fragment.contains('whereFrom')) 
+    //if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('refresh') && fragment.contains('whereFrom')) 
+    if (fragment.contains('?') && fragment.contains('jwt') && fragment.contains('refresh')) //whereFrom can be empty
     {
         //String fragmentPath = fragment.split('?')[0]; //which is /login
         String fragmentQuery = fragment.split('?')[1];

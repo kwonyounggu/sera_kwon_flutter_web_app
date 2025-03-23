@@ -103,13 +103,13 @@ final routerProvider = Provider<GoRouter>
           {
             gotoRoute = whereFrom;
           }
-          //there were some errors like in auth_state_provider.dart while writting jwt token
-          //so just route to home temporary
-          //else {return null;} 
-          //{
-          //  gotoRoute = '/';
-          //}
-          //No else is allowed (eg: isLoggedIn && /logout)
+          //if isLoggedIn is true then no login button available therefore 
+          //1. isLoggingIn is only possible if the user types in the url directly https://webmonster.ca#/login
+          //2. isLoggedIn is false and the user types in the url directly then login_screen_ds.dart returns to here
+          else if (isLoggingIn) 
+          {
+            gotoRoute = '/'; //just go home in the two cases above
+          }
         }
         else //not logged in yet
         {
@@ -168,3 +168,21 @@ final routerProvider = Provider<GoRouter>
     return router;
   }
 );*/
+
+/**
+ * if (isLoggedIn) 
+{
+    final String currentPath = state.uri.path;
+    
+    // Ensure no unnecessary redirection after token refresh
+    if (isLoggingIn && state.uri.queryParameters.containsKey("whereFrom")) 
+    {
+        gotoRoute = state.uri.queryParameters["whereFrom"];
+    } 
+    else if (isLoggingIn) 
+    {
+        gotoRoute = currentPath; // Stay on the current page
+    }
+}
+
+ */
