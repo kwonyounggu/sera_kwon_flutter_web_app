@@ -15,7 +15,6 @@ class AuthState
   final int? userId;
   final String? userEmail;
   final DateTime? expiryDate;
-  final bool isLoading; // New: Loading state
 
   AuthState
   (
@@ -25,32 +24,8 @@ class AuthState
       this.userId,
       this.userEmail,
       this.expiryDate,
-      this.isLoading = false, // Default to false
     }
   );
-
-  AuthState copyWith
-  (
-    {
-      bool? isLoggedIn,
-      String? jwt,
-      int? userId,
-      String? userEmail,
-      DateTime? expiryDate,
-      bool? isLoading,
-    }
-  ) 
-  {
-    return AuthState
-    (
-      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
-      jwt: jwt ?? this.jwt,
-      userId: userId ?? this.userId,
-      userEmail: userEmail ?? this.userEmail,
-      expiryDate: expiryDate ?? this.expiryDate,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
 }
 class AuthNotifier extends StateNotifier<AuthState> 
 {
@@ -199,8 +174,6 @@ class AuthNotifier extends StateNotifier<AuthState>
 
   Future<void> refreshAccessToken(String refreshToken) async 
   {
-    state = state.copyWith(isLoading: true); // Set loading state
-    authStateListenable.value = state;
     try 
     {
       final response = await http.post
@@ -232,12 +205,6 @@ class AuthNotifier extends StateNotifier<AuthState>
     catch (e) 
     {
       print("Token refresh error: $e");
-      logout();
-    }
-    finally
-    {
-      state = state.copyWith(isLoading: false); // Reset loading state
-      authStateListenable.value = state;
     }
   }
 
