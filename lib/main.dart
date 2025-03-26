@@ -9,28 +9,28 @@ import 'package:flutter_localizations/flutter_localizations.dart'; // Import loc
 //navigatorKey used in TokenService running separately
 //it is set router_provider.dart as GoRouter(navigatorKey:navigatorKey,...)
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); 
+
 void main() 
 {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(ProviderScope(child: MyApp(tokenService: TokenService(navigatorKey))));
 }
 
 class MyApp extends ConsumerWidget 
 {
-  const MyApp({super.key});
+  final TokenService tokenService;
+  const MyApp({super.key, required this.tokenService});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) 
   {
     final router = ref.watch(routerProvider);
 
-    // Initialize TokenService and start the refresh timer
-    Future.delayed
+    // Start TokenService timer after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback
     (
-      Duration.zero, 
-      () 
+      (_) 
       {
-        final tokenService = TokenService(navigatorKey);
-        if (context.mounted) tokenService.startTokenRefreshTimer();
+        tokenService.startTokenRefreshTimer(ref);
       }
     );
 

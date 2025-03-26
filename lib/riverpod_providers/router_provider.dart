@@ -31,8 +31,8 @@ final routerProvider = Provider<GoRouter>
 (
   (ref) 
   {
-    //final authNotifier = ref.read(authNotifierProvider.notifier);
-    final authState =  ref.watch(authNotifierProvider);
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    //final authState =  ref.watch(authNotifierProvider);
     return GoRouter
     (
       navigatorKey: navigatorKey, // ✅ Use global key here defined in main.dart
@@ -74,7 +74,7 @@ final routerProvider = Provider<GoRouter>
       ],
       redirect: (context, state) 
       {
-        //final authState = authNotifier.state;
+        final authState = authNotifier.state;
         final isLoggedIn = authState.isLoggedIn;
         final currentPath = state.uri.path;
         

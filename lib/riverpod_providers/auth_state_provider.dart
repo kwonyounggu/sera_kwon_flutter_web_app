@@ -5,21 +5,21 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 class AuthState 
 {
   final bool isLoggedIn;
-  final String? jwt;
+  //final String? jwt;
   final int? userId;
   final String? userEmail;
-  final DateTime? expiryDate;
-  final bool isLoading; // New: Loading state
+  //final DateTime? expiryDate;
+  //final bool isLoading; // New: Loading state
 
   AuthState
   (
     {
       required this.isLoggedIn,
-      this.jwt,
+      //this.jwt,
       this.userId,
       this.userEmail,
-      this.expiryDate,
-      this.isLoading = false, // Default to false
+      //this.expiryDate,
+      //this.isLoading = false, // Default to false
     }
   );
 
@@ -27,22 +27,22 @@ class AuthState
   (
     {
       bool? isLoggedIn,
-      String? jwt,
+      //String? jwt,
       int? userId,
       String? userEmail,
-      DateTime? expiryDate,
-      bool? isLoading,
+      //DateTime? expiryDate,
+      //bool? isLoading,
     }
   ) 
   {
     return AuthState
     (
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
-      jwt: jwt ?? this.jwt,
+      //jwt: jwt ?? this.jwt,
       userId: userId ?? this.userId,
       userEmail: userEmail ?? this.userEmail,
-      expiryDate: expiryDate ?? this.expiryDate,
-      isLoading: isLoading ?? this.isLoading,
+      //expiryDate: expiryDate ?? this.expiryDate,
+      //isLoading: isLoading ?? this.isLoading,
     );
   }
 }
@@ -67,11 +67,14 @@ class AuthNotifier extends StateNotifier<AuthState>
     } 
     else 
     {
-      await _storage.delete(key: 'jwt'); // Clear invalid token
+      //eventhough it is expired it will be refreshed
+      //so new token will be stored in as jwt and isLoggedIn = true through TokenService
+      await _storage.delete(key: 'jwt');
       state = AuthState(isLoggedIn: false);
     }
   }
 
+  /// Note that all the information other than userId, userEmail, etc is in jwt of FlutterSecureStorage
   void _updateStateFromToken(String jwt) 
   {
     final decodedToken = JwtDecoder.decode(jwt);
@@ -79,30 +82,29 @@ class AuthNotifier extends StateNotifier<AuthState>
     state = AuthState
     (
       isLoggedIn: true,
-      jwt: jwt,
+      //jwt: jwt,
       userId: decodedToken['user_id'],
       userEmail: decodedToken['email'],
-      expiryDate: JwtDecoder.getExpirationDate(jwt),
+      //expiryDate: JwtDecoder.getExpirationDate(jwt),
     );
   }
 
+  void updateToken(String jwt) 
+  {
+    print("INFO: updateToken(...) is called");
+    _updateStateFromToken(jwt);
+  }
+
+  //refresh token lasts for 7 days
+  //unless the user does not logout (refresh token = null then) and
+  //use the web page within 7 days then login will last forever
   void login(String jwt, String refreshToken)
   {
-    final decodedToken = JwtDecoder.decode(jwt);
-    final userId = decodedToken['user_id']; 
-    final userEmail = decodedToken['email']; 
-    final expiryDate = JwtDecoder.getExpirationDate(jwt);
-
-    // Update state
-    state = AuthState
-    (
-      isLoggedIn: true,
-      jwt: jwt, 
-      userId: userId,
-      userEmail: userEmail,
-      expiryDate: expiryDate,
-    );
-
+    _updateStateFromToken(jwt);
+ 
+    print("access token expire date: ${JwtDecoder.getExpirationDate(jwt)}");
+    print("refresh token expire date: ${JwtDecoder.getExpirationDate(refreshToken)}");
+    print("refresh token just got from server: $refreshToken");
     // Store token in secure storage
     _storage.write(key: 'jwt', value: jwt);
     _storage.write(key: 'refresh_token', value: refreshToken);

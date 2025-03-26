@@ -3,65 +3,73 @@ import 'dart:convert';
 
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
+
 class TokenService 
 {
+  static TokenService? _instance; // Make it nullable and use lazy initialization.
   final GlobalKey<NavigatorState> navigatorKey;
-  TokenService(this.navigatorKey); // ✅ Accept navigatorKey in constructor
+  // Private constructor with parameters
+  TokenService._internal(this.navigatorKey); // ✅ Accept navigatorKey in constructor
+
+  factory TokenService(GlobalKey<NavigatorState> navigatorKey) 
+  {
+    _instance ??= TokenService._internal(navigatorKey); // Initialize if null
+    return _instance!;
+  }
 
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   Timer? tokenRefreshTimer;
+  bool _timerStarted = false; // Flag to track if timer has started
 
-  void startTokenRefreshTimer() 
+  void startTokenRefreshTimer(WidgetRef ref) 
   { 
+    //if not logged in then immediately try to get the refresh token
+    if (_timerStarted) return; // Prevent multiple starts
+
     print("INFO: startTokenRefreshTimer() of TokenService is called");
     tokenRefreshTimer?.cancel(); //in case we have a timer, we'll cancel it.
     tokenRefreshTimer = Timer.periodic
     (
-      Duration(minutes: 2), 
+      Duration(minutes: TOKEN_REFRESH_TIME_MIN), 
       (timer) async 
       {
         final refreshToken = await _storage.read(key: 'refresh_token');
-        if (refreshToken != null) 
+        if (refreshToken != null && timer.isActive) 
         {
-          if (timer.isActive) {await refreshAccessToken(refreshToken);}
-          else {return;}
+          await refreshAccessToken(refreshToken, ref);
         } 
         else 
         {
           timer.cancel(); // Stop if no refresh token exists
         }
+        _timerStarted = true; 
       },
     );
   }
 
   void printToken(String jwt)
   {
-    print("#### Refresh token returned successfully ####");
     final decodedToken = JwtDecoder.decode(jwt);
-    print("Decoded Token: $decodedToken");
-
-    // Access specific claims
-    final userId = decodedToken['user_id']; // 'sub' is a common claim for user ID
-    print("User ID: $userId");
-
-    final userEmail = decodedToken['email']; // 'sub' is a common claim for user ID
-    print("User Email: $userEmail");
-
-    // Check expiration
-    final isExpired = JwtDecoder.isExpired(jwt);
-    print("Is Expired: $isExpired");
-
-    // Get expiration date
-    final expiryDate = JwtDecoder.getExpirationDate(jwt);
-    print("Expiry Date: $expiryDate");
+    print('''
+    #### Refresh token returned successfully ####
+    Decoded Token: $decodedToken
+    User ID: ${decodedToken['user_id']}
+    User Email: ${decodedToken['email']}
+    Is Expired: ${JwtDecoder.isExpired(jwt)}
+    Expiry Date: ${JwtDecoder.getExpirationDate(jwt)}
+    ''');
   }
-  Future<void> refreshAccessToken(String refreshToken) async 
+
+  Future<void> refreshAccessToken(String refreshToken, WidgetRef ref) async 
   {
+    print("INFO: refreshAccessToken of TokenService, refreshToken: $refreshToken");
     try 
     {
       final response = await http.post
@@ -80,7 +88,12 @@ class TokenService
         final BuildContext? context = navigatorKey.currentContext;
         if (context != null && context.mounted) 
         {
-          GoRouter.of(context).refresh(); // Only refresh the UI
+          if (!ref.read(authNotifierProvider).isLoggedIn)
+          {  
+            ref.read(authNotifierProvider.notifier).updateToken(newAccessToken);
+            //GoRouter.of(context).go('/contact'); //testing
+          }
+          //GoRouter.of(context).refresh(); // Only refresh the UI
         }
       } 
       else 
@@ -97,6 +110,11 @@ class TokenService
     catch (e) 
     {
       print("Token refresh error: $e");
+      tokenRefreshTimer?.cancel(); // Cancel timer on critical errors
+    }
+    finally 
+    {
+      print("INFO: refreshAccessToken(...) has been implemented");
     }
   }
 }
