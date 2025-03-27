@@ -43,8 +43,10 @@ final routerProvider = Provider<GoRouter>
           name: 'logout',
           redirect: (context, state) 
           {
-            //authNotifier.logout();
-            ref.read(authNotifierProvider.notifier).logout();
+            if (authNotifier.state.isLoggedIn)
+            {
+              ref.read(authNotifierProvider.notifier).logout();
+            }
             return '/'; // No redirection loop
           },
         ),
@@ -72,22 +74,26 @@ final routerProvider = Provider<GoRouter>
           ],
         ),
       ],
+      refreshListenable: authNotifier.authStateListenable,
       redirect: (context, state) 
       {
-        final authState = authNotifier.state;
+        final authState = authNotifier.authState(); 
         final isLoggedIn = authState.isLoggedIn;
         final currentPath = state.uri.path;
         
         debugPrint("redirect state.uri.path: $currentPath, isLoggedIn: $isLoggedIn");
 
-        // If the user is logged in, do not force redirection to home
-        if (isLoggedIn && currentPath != '/login') 
+        if (isLoggedIn)
         {
+          if (currentPath == '/login') return '/';
           return null; // Stay on the current route
         }
 
-        if (!isLoggedIn && (currentPath == '/blog_writing' || currentPath == '/profile')) {
-          return '/login?whereFrom=$currentPath';
+        //Not isLoggedIn from here
+        switch(currentPath)
+        {
+          case '/blog_writing': 
+          case '/blog_publish': return '/login?whereFrom$currentPath';
         }
 
         return null; // No redirection unless needed

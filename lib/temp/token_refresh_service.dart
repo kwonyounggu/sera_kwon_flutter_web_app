@@ -90,7 +90,7 @@ class TokenService
         {
           if (!ref.read(authNotifierProvider).isLoggedIn)
           {  
-            ref.read(authNotifierProvider.notifier).updateToken(newAccessToken);
+            //ref.read(authNotifierProvider.notifier).updateToken(newAccessToken);
             //GoRouter.of(context).go('/contact'); //testing
           }
           //GoRouter.of(context).refresh(); // Only refresh the UI

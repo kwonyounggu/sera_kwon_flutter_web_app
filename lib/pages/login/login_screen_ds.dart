@@ -2,6 +2,7 @@ import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -29,10 +30,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   void initState() 
   {
     super.initState();
-    _checkForLoginToken();  // Call the function to check for the JWT and whereFrom
+    WidgetsBinding.instance.addPostFrameCallback
+    (
+      (_) 
+      {
+        _checkForLoginToken(context);
+      }
+    );
   }
 
-  void _checkForLoginToken() async 
+  void _checkForLoginToken(BuildContext context) async 
   {
     setState
     (
@@ -61,7 +68,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         String refreshToken = fragmentParams['refresh']!;
         if (jwtToken.isNotEmpty)
         {
-            Future.microtask(() {ref.read(authNotifierProvider.notifier).login(jwtToken, refreshToken);});              
+            Future.microtask
+            (
+              () 
+              {
+                ref.read(authNotifierProvider.notifier).login(jwtToken, refreshToken);
+                if (context.mounted) context.go("/");
+              }
+            );              
         }
         else 
         {

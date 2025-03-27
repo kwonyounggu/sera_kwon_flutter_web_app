@@ -84,11 +84,11 @@ class AppDrawerWidget extends ConsumerWidget
                 childrenPadding: EdgeInsets.only(left:20),
                 children: <Widget>
                 [
-                  for (MenuItem item in [MenuItem.blog_list, 
-                                        //MenuItem.blog_writing,
-                                        ])
-                    buildMenuItem(context, ref, item, fontSize),
-                  buildMenuItemDisabled(context, ref, MenuItem.blog_writing, fontSize),
+                  buildMenuItem(context, ref, MenuItem.blog_list, fontSize),
+                  if (authState.isLoggedIn && authState.userType!.toLowerCase() != 'general')
+                    buildMenuItem(context, ref, MenuItem.blog_writing, fontSize)
+                  else
+                    buildMenuItemDisabled(context, ref, MenuItem.blog_writing, fontSize),
                 ],
               ),
               for (MenuItem item in [

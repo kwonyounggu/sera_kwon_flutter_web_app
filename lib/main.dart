@@ -1,4 +1,4 @@
-import 'package:drkwon/services/token_refresh_service.dart';
+import 'package:drkwon/temp/token_refresh_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,13 +12,15 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() 
 {
-  runApp(ProviderScope(child: MyApp(tokenService: TokenService(navigatorKey))));
+  runApp(ProviderScope(child: const MyApp()));
+  //runApp(ProviderScope(child: MyApp(tokenService: TokenService(navigatorKey))));
 }
 
 class MyApp extends ConsumerWidget 
 {
-  final TokenService tokenService;
-  const MyApp({super.key, required this.tokenService});
+  //final TokenService tokenService;
+  //const MyApp({super.key, required this.tokenService});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) 
@@ -26,13 +28,13 @@ class MyApp extends ConsumerWidget
     final router = ref.watch(routerProvider);
 
     // Start TokenService timer after the first frame is rendered
-    WidgetsBinding.instance.addPostFrameCallback
+    /*WidgetsBinding.instance.addPostFrameCallback
     (
       (_) 
       {
         tokenService.startTokenRefreshTimer(ref);
       }
-    );
+    );*/
 
     return MaterialApp.router
     (
