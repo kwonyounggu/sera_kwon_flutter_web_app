@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+// see https://chatgpt.com/c/67cdefdb-55b0-800a-ab98-544e875de6e2 on Mar 28 Fri
 class AuthState 
 {
   final bool isLoggedIn;
@@ -113,6 +114,7 @@ class AuthNotifier extends StateNotifier<AuthState>
     _updateStateFromToken(jwt);
 
     // Start the refresh timer
+    // See https://chatgpt.com/c/67cdefdb-55b0-800a-ab98-544e875de6e2
     startTokenRefreshTimer();
   }
 
@@ -205,6 +207,7 @@ class AuthNotifier extends StateNotifier<AuthState>
   void dispose() 
   {
     authStateListenable.dispose();  // Dispose of the ValueNotifier
+    tokenRefreshTimer?.cancel();
     super.dispose();
   }
 }

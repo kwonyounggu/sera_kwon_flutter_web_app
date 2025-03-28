@@ -73,6 +73,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               () 
               {
                 ref.read(authNotifierProvider.notifier).login(jwtToken, refreshToken);
+                
+                //if whereFrom == null then context.go("/")
+                //else if whereFrom == /blog_writing 
+                //  if user_type == 'general' then context.go('/profile?whereFrom=/blog_writing')
+                //  else context.go(whereFrom)
+                //else goto context.go(whereFrom)
                 if (context.mounted) context.go("/");
               }
             );              
