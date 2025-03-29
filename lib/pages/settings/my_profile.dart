@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // For storing tokens
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -13,20 +14,28 @@ class ProfileSetupScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
-  String _selectedRole = 'General User';
-  bool _isDoctor = false;
-  String? _selectedProvinceState;
-  String? _selectedDoctorType;
+  final _formKey = GlobalKey<FormState>();
   final _storage = FlutterSecureStorage();
-  final List<String> _provincesStates = [
-    'Ontario', 'Quebec', 'British Columbia', 'California', 'New York', // Example list
-    // Add all Provinces/States here
-  ];
-  final List<String> _doctorTypes = ['Eye Doctor', 'Medical Doctor'];
+  String _selectedRole = 'general';
+  bool get _isDoctor => _selectedRole == 'od' || _selectedRole == 'md';
+  
+  // Form fields
+  String? _clinicName;
+  String? _address;
+  String? _phone;
+  String? _profilePicture;
+  String? _selfDescription;
   bool _isLoading = false;
   String? _errorMessage;
 
-  Future<void> _saveProfile() async {
+  final InputDecoration _fieldDecoration = InputDecoration(
+    border: OutlineInputBorder(),
+    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+  );
+
+  Future<void> _updateProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -34,21 +43,23 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     try {
       final token = await _storage.read(key: 'auth_token');
-      if (token == null) {
-        throw Exception('Authentication token not found.');
-      }
+      if (token == null) throw Exception('Authentication token not found.');
 
-      final url = Uri.parse('YOUR_BACKEND_API_URL/profile'); // Replace with your backend URL
       final response = await http.post(
-        url,
+        Uri.parse('YOUR_BACKEND_API_URL/profile'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
           'role': _selectedRole,
-          'provinceState': _selectedProvinceState,
-          'doctorType': _selectedDoctorType,
+          if (_isDoctor) ...{
+            'clinic_name': _clinicName,
+            'address': _address,
+            'phone': _phone,
+            'self_description': _selfDescription,
+          },
+          'profile_picture': _profilePicture,
         }),
       );
 
@@ -56,16 +67,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Profile updated successfully!')),
         );
-        Navigator.pop(context); // Go back to the previous screen
+        Navigator.pop(context);
       } else {
-        final error = jsonDecode(response.body)['detail'];
         setState(() {
-          _errorMessage = error;
+          _errorMessage = jsonDecode(response.body)['detail'] ?? 'Update failed';
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'An error occurred: $e';
+        _errorMessage = 'An error occurred: ${e.toString()}';
       });
     } finally {
       setState(() {
@@ -74,100 +84,207 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     }
   }
 
+  Widget _buildRoleSelector() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Account Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 20,
+              children: [
+                _RoleRadio(
+                  value: 'general',
+                  groupValue: _selectedRole,
+                  label: 'General User',
+                  onChanged: (v) => setState(() => _selectedRole = v!),
+                ),
+                _RoleRadio(
+                  value: 'od',
+                  groupValue: _selectedRole,
+                  label: 'Optometrist (OD)',
+                  onChanged: (v) => setState(() => _selectedRole = v!),
+                ),
+                _RoleRadio(
+                  value: 'md',
+                  groupValue: _selectedRole,
+                  label: 'Medical Doctor (MD)',
+                  onChanged: (v) => setState(() => _selectedRole = v!),
+                ),
+                _RoleRadio(
+                  value: 'admin',
+                  groupValue: _selectedRole,
+                  label: 'Administrator',
+                  onChanged: (v) => setState(() => _selectedRole = v!),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Profile Setup')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: Text('Professional Profile Setup'),
+        elevation: 0,
+      ),
+      body: Form(
+        key: _formKey,
         child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RadioListTile(
-                title: Text('General User'),
-                value: 'General User',
-                groupValue: _selectedRole,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedRole = value!;
-                    _isDoctor = false;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: Text('Doctor'),
-                value: 'Doctor',
-                groupValue: _selectedRole,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedRole = value!;
-                    _isDoctor = true;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: Text('Admin'),
-                value: 'Admin',
-                groupValue: _selectedRole,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedRole = value!;
-                    _isDoctor = false;
-                  });
-                },
-              ),
-              if (_isDoctor) ...[
-                DropdownButtonFormField<String>(
-                  value: _selectedProvinceState,
-                  items: _provincesStates.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedProvinceState = value;
-                    });
-                  },
-                  decoration: InputDecoration(labelText: 'Province/State'),
-                ),
-                DropdownButtonFormField<String>(
-                  value: _selectedDoctorType,
-                  items: _doctorTypes.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedDoctorType = value;
-                    });
-                  },
-                  decoration: InputDecoration(labelText: 'Doctor Type'),
-                ),
-              ],
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(color: Colors.red),
+              _buildRoleSelector(),
+              SizedBox(height: 20),
+              
+              // Profile Picture
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Profile Picture', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        decoration: _fieldDecoration.copyWith(
+                          labelText: 'Image URL',
+                          prefixIcon: Icon(Icons.link),
+                        ),
+                        onChanged: (v) => _profilePicture = v,
+                        validator: (v) => v!.isEmpty ? 'Please enter a valid URL' : null,
+                      ),
+                      if (_profilePicture != null && _profilePicture!.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(_profilePicture!),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _saveProfile,
-                child: _isLoading
-                    ? CircularProgressIndicator()
-                    : Text('Save Profile'),
+              ),
+              
+              if (_isDoctor) ...[
+                SizedBox(height: 20),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Professional Information', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          decoration: _fieldDecoration.copyWith(
+                            labelText: 'Clinic/Hospital Name',
+                            prefixIcon: Icon(Icons.business),
+                          ),
+                          onChanged: (v) => _clinicName = v,
+                          validator: (v) => v!.isEmpty ? 'Required field' : null,
+                        ),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          decoration: _fieldDecoration.copyWith(
+                            labelText: 'Clinic Address',
+                            prefixIcon: Icon(Icons.location_on),
+                          ),
+                          onChanged: (v) => _address = v,
+                          validator: (v) => v!.isEmpty ? 'Required field' : null,
+                        ),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          decoration: _fieldDecoration.copyWith(
+                            labelText: 'Contact Phone',
+                            prefixIcon: Icon(Icons.phone),
+                          ),
+                          keyboardType: TextInputType.phone,
+                          onChanged: (v) => _phone = v,
+                          validator: (v) => v!.isEmpty ? 'Required field' : null,
+                        ),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          decoration: _fieldDecoration.copyWith(
+                            labelText: 'Professional Bio',
+                            prefixIcon: Icon(Icons.description),
+                          ),
+                          maxLines: 3,
+                          onChanged: (v) => _selfDescription = v,
+                          validator: (v) => v!.isEmpty ? 'Please provide a brief description' : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              
+              if (_errorMessage != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+              
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _isLoading ? null : _updateProfile,
+                  child: _isLoading
+                      ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator())
+                      : Text('SAVE PROFILE', style: TextStyle(fontSize: 16)),
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _RoleRadio extends StatelessWidget {
+  final String value;
+  final String groupValue;
+  final String label;
+  final ValueChanged<String?> onChanged;
+
+  const _RoleRadio({
+    required this.value,
+    required this.groupValue,
+    required this.label,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<String>(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+        Text(label, style: TextStyle(fontSize: 14)),
+      ],
     );
   }
 }

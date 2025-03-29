@@ -2,6 +2,7 @@
 import 'package:drkwon/main.dart';
 import 'package:drkwon/pages/blog/blog_creation_dr.dart';
 import 'package:drkwon/pages/blog/public_blog_listing.dart';
+import 'package:drkwon/pages/about/about_me.dart';
 import 'package:drkwon/pages/contact/contact.dart';
 import 'package:drkwon/pages/faq/faq.dart';
 
@@ -68,6 +69,7 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/blog_writing', name: 'blog_writing', builder: (context, state) => BlogCreationPage()),
             GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
             GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
+            GoRoute(path: '/aboutme', name: 'aboutme', builder: (context, state) => AboutMeScreen()),
             GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
             GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileSetupScreen()),
             GoRoute(path: '/login', name: 'login', builder: (context, state) => LoginScreen()),

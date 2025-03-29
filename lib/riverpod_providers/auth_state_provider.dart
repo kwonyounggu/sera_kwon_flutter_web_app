@@ -32,7 +32,7 @@ class AuthState
   }
 }
 
-class AuthNotifier extends StateNotifier<AuthState> 
+class AuthNotifier extends StateNotifier<AuthState> with WidgetsBindingObserver
 {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   Timer? tokenRefreshTimer;
@@ -40,8 +40,22 @@ class AuthNotifier extends StateNotifier<AuthState>
   
   AuthNotifier() : super(AuthState(isLoggedIn: false)) 
   {
-    print("AuthNotifier, _loadToken is called");
+    debugPrint("INFO ${DateTime.now()}:AuthNotifier, _loadToken is called");
     _loadToken();
+    WidgetsBinding.instance.addObserver(this); // Listen for app lifecycle changes
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) 
+  {
+    if (state == AppLifecycleState.paused) 
+    {
+      tokenRefreshTimer?.cancel(); // Stop timer when app is backgrounded
+    } 
+    else if (state == AppLifecycleState.resumed) 
+    {
+      startTokenRefreshTimer(); // Safely restart timer on resume
+    }
   }
 
   Future<void> _loadToken() async 
@@ -53,26 +67,31 @@ class AuthNotifier extends StateNotifier<AuthState>
     {
       final isExpired = JwtDecoder.isExpired(jwt);
       if (!isExpired) //isLoggedIn <- True
-      { print("INFO _loadToken, token is not expired --1--");
+      { 
+        debugPrint("INFO ${DateTime.now()}: _loadToken, token is not expired --1--");
         _updateStateFromToken(jwt);
       }
       else if (refreshToken != null) //get new token using refresh_token
-      { print("INFO _loadToken, token is expired so get new one --2--");
+      { 
+        debugPrint("INFO ${DateTime.now()}: _loadToken, token is expired so get new one --2--");
         await refreshAccessToken(refreshToken); // Try refreshing for a new token
       }
       else //token is expired and no refresh token, is this case possible?
-      { print("INFO _loadToken, token is expired and refresh token is null --3--");
+      { 
+        debugPrint("INFO ${DateTime.now()}: _loadToken, token is expired and refresh token is null --3--");
         await _storage.delete(key: 'jwt'); // Clear invalid token
         //state = AuthState(isLoggedIn: false);
         //authStateListenable.value = state; // Notify listeners
       }
     }
     else if (refreshToken != null) //is this case possible?
-    {   print("INFO _loadToken, token is null but refresh token is not null --4--");
+    {   
+      debugPrint("INFO ${DateTime.now()}: _loadToken, token is null but refresh token is not null --4--");
         await refreshAccessToken(refreshToken); // Try refreshing for a new token
     }
     else //jwt == null && refresh_token == null
-    { print("INFO _loadToken, token and refresh token both are null --5--");
+    { 
+      debugPrint("INFO ${DateTime.now()}: _loadToken, token and refresh token both are null --5--");
        //state = AuthState(isLoggedIn: false);
        //authStateListenable.value = state; // Notify listeners
     }
@@ -80,7 +99,7 @@ class AuthNotifier extends StateNotifier<AuthState>
 
   void _updateStateFromToken(String jwt) 
   {
-    print("INFO _updateStateFromToken, --1--");
+    debugPrint("INFO ${DateTime.now()}: _updateStateFromToken, --1--");
     final decodedToken = JwtDecoder.decode(jwt);
     
     if (!state.isLoggedIn)
@@ -104,9 +123,9 @@ class AuthNotifier extends StateNotifier<AuthState>
   {
     
  
-    print("INFO: login() access token expire date: ${JwtDecoder.getExpirationDate(jwt)}");
-    print("INFO: login() refresh token expire date: ${JwtDecoder.getExpirationDate(refreshToken)}");
-    print("INFO: login() refresh token just got from server: $refreshToken");
+    debugPrint("INFO ${DateTime.now()}:: login() access token expire date: ${JwtDecoder.getExpirationDate(jwt)}");
+    debugPrint("INFO ${DateTime.now()}:: login() refresh token expire date: ${JwtDecoder.getExpirationDate(refreshToken)}");
+    debugPrint("INFO ${DateTime.now()}:: login() refresh token just got from server: $refreshToken");
     // Store token in secure storage
     _storage.write(key: 'jwt', value: jwt);
     _storage.write(key: 'refresh_token', value: refreshToken);
@@ -119,8 +138,9 @@ class AuthNotifier extends StateNotifier<AuthState>
   }
 
   void startTokenRefreshTimer() 
-  { print("INFO: startTokenRefreshTimer(...) is called --1--");
-    //tokenRefreshTimer?.cancel();
+  { 
+    debugPrint("INFO ${DateTime.now()}:: startTokenRefreshTimer(...) is called --1--");
+    tokenRefreshTimer?.cancel();
     tokenRefreshTimer = Timer.periodic
     (
       Duration(minutes: TOKEN_REFRESH_TIME_MIN), //14
@@ -128,7 +148,8 @@ class AuthNotifier extends StateNotifier<AuthState>
       {
         final refreshToken = await _storage.read(key: 'refresh_token');
         if (refreshToken != null) 
-        { print("INFO: startTokenRefreshTimer(...) is called --2--");
+        { 
+          debugPrint("INFO ${DateTime.now()}: startTokenRefreshTimer(...) is called --2--");
           await refreshAccessToken(refreshToken);
         } 
         else 
@@ -140,7 +161,8 @@ class AuthNotifier extends StateNotifier<AuthState>
   }
   
   Future<void> refreshAccessToken(String refreshToken) async 
-  { print("INFO: refreshAccessToken(...) is called --1--");
+  { 
+    debugPrint("INFO ${DateTime.now()}: refreshAccessToken(...) is called --1--");
     state = state.copyWith(isLoading: true); // Set loading state
     authStateListenable.value = state;
     try 
@@ -160,17 +182,18 @@ class AuthNotifier extends StateNotifier<AuthState>
         final newAccessToken = json.decode(response.body)['access_token'];
         await _storage.write(key: 'jwt', value: newAccessToken);
         _updateStateFromToken(newAccessToken);
+        startTokenRefreshTimer();
       } 
       else 
       {
-        print("INFO: refreshAccessToken, Refresh token failed or expired. User needs to log in again.");
+        debugPrint("INFO ${DateTime.now()}: refreshAccessToken, Refresh token failed or expired. User needs to log in again.");
         //_showSessionExpiredDialog
         logout();
       }
     } 
     catch (e) 
     {
-      print("Token refresh error: $e");
+      debugPrint("INFO ${DateTime.now()}: Token refresh error: $e");
       logout();
     }
     finally
@@ -206,6 +229,7 @@ class AuthNotifier extends StateNotifier<AuthState>
   @override
   void dispose() 
   {
+    WidgetsBinding.instance.removeObserver(this); // Observer removed
     authStateListenable.dispose();  // Dispose of the ValueNotifier
     tokenRefreshTimer?.cancel();
     super.dispose();

@@ -61,3 +61,20 @@ final Map<MenuItem, DrawerItem> drawerItems =
   MenuItem.aboutme: DrawerItem('AboutMe', Icons.account_box, '/aboutme', 'aboutme'),
   MenuItem.logout: DrawerItem('Logout', Icons.exit_to_app, '/logout', 'logout'),
 };
+
+final Map<String, String> routeTitles = 
+{
+  '/': 'Home',
+  '/cataracts': 'Cataracts Services',
+  '/eye_exam' : 'Comprehensive Eye Exam',
+  '/dry_eyes' : 'Dry Eyes Services',
+  '/contact_lens' : 'Contact Lens Services',
+  '/other_diseases' : 'Other Eye Diseases',
+  '/blog_list' : 'Blog List',
+  '/blog_writing': 'New Blog Post',
+  '/faq' : 'Frequently Asked Questions',
+  '/contact' : 'Contact Me',
+  '/aboutme' : 'About Me',
+  '/profile' : 'Update My Profile',
+  '/login' : 'Your Login',
+};

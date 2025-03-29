@@ -11,3 +11,7 @@ add a package in the project directory
 >flutter clean
 >flutter pub get
 >flutter build web --pwa-strategy=none --release --base-href "/"
+
+//see https://chat.deepseek.com/a/chat/s/c75148de-b551-4ef5-95ff-a0fbb22b5517
+>ipconfig getifaddr en0
+>flutter run -d chrome --web-hostname=0.0.0.0 --web-port=8080

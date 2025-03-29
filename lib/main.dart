@@ -6,20 +6,17 @@ import 'package:drkwon/riverpod_providers/router_provider.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // Import FlutterQuill
 import 'package:flutter_localizations/flutter_localizations.dart'; // Import localization
 
-//navigatorKey used in TokenService running separately
+//navigatorKey used in TokenService running separately, not used any more
 //it is set router_provider.dart as GoRouter(navigatorKey:navigatorKey,...)
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); 
 
 void main() 
 {
   runApp(ProviderScope(child: const MyApp()));
-  //runApp(ProviderScope(child: MyApp(tokenService: TokenService(navigatorKey))));
 }
 
 class MyApp extends ConsumerWidget 
 {
-  //final TokenService tokenService;
-  //const MyApp({super.key, required this.tokenService});
   const MyApp({super.key});
 
   @override
@@ -27,23 +24,15 @@ class MyApp extends ConsumerWidget
   {
     final router = ref.watch(routerProvider);
 
-    // Start TokenService timer after the first frame is rendered
-    /*WidgetsBinding.instance.addPostFrameCallback
-    (
-      (_) 
-      {
-        tokenService.startTokenRefreshTimer(ref);
-      }
-    );*/
-
     return MaterialApp.router
     (
       routerConfig: router,
       title: 'Eye Doctor Dr.KWON', 
       theme: ThemeData
       (
-        primarySwatch: Colors.blue,
-        fontFamily: 'Roboto',
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        cardTheme: CardTheme(elevation: 2),
+        useMaterial3: true,
       ),
       scrollBehavior: CustomScrollBehavior(),
       localizationsDelegates: const [

@@ -34,6 +34,7 @@ class AppDrawerWidget extends ConsumerWidget
               ExpansionTile
               (
                 leading: Icon(drawerItems[MenuItem.services]!.icon),
+                
                 title: AutoSizeText
                 (
                   drawerItems[MenuItem.services]!.title,
@@ -94,6 +95,7 @@ class AppDrawerWidget extends ConsumerWidget
               for (MenuItem item in [
                                     MenuItem.faq, 
                                     MenuItem.contact,
+                                    MenuItem.aboutme
                                     ])
                   buildMenuItem(context, ref, item, fontSize),
 
@@ -127,6 +129,7 @@ class AppDrawerWidget extends ConsumerWidget
                 ):
                 ListTile
                 (
+                  hoverColor: Colors.blue[50],
                   leading: Icon(drawerItems[MenuItem.settings]!.icon, color: Colors.grey,),
                   title: AutoSizeText
                   (
@@ -151,6 +154,7 @@ class AppDrawerWidget extends ConsumerWidget
   {
     return ListTile
     (
+      hoverColor: Colors.blue[50],
       leading: Icon(drawerItems[item]!.icon),
       title: AutoSizeText
       (
@@ -173,6 +177,7 @@ class AppDrawerWidget extends ConsumerWidget
   {
     return ListTile
     (
+      hoverColor: Colors.blue[50],
       leading: Icon(drawerItems[item]!.icon, color: Colors.grey,),
       title: AutoSizeText
       (

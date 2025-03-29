@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 
 class ContactScreen extends StatelessWidget {
   const ContactScreen({super.key});
@@ -11,23 +11,19 @@ class ContactScreen extends StatelessWidget {
     );
   }
 }
-
-
-/*
+*/
 import 'package:flutter/material.dart';
 
 
 
-class ContactScreen extends StatelessWidget 
+class AboutMeScreen extends StatelessWidget 
 {
-  const ContactScreen({super.key});
+  const AboutMeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Optometrist Dr. S Kwon - Profile'),
-      ),
+     
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -292,4 +288,3 @@ class ContactScreen extends StatelessWidget
     );
   }
 }
-*/
