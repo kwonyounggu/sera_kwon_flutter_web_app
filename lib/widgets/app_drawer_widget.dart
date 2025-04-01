@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:drkwon/model/menu.dart';
+import 'package:drkwon/pages/admin/message_creation_dialog.dart';
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,7 +146,19 @@ class AppDrawerWidget extends ConsumerWidget
             ]
           )
         ),
+        if (authState.isLoggedIn && authState.userType == 'admin')
+            ListTile
+            (
+              leading: const Icon(Icons.announcement),
+              title: const Text('Post Announcement'),
+              onTap: () => showDialog
+              (
+                context: context,
+                builder: (context) => const MessageCreationDialog(),
+              ),
+            ),
         if (authState.isLoggedIn) buildMenuItem(context, ref, MenuItem.logout, fontSize)
+
       ]
     );
   }

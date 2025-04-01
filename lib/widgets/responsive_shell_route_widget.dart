@@ -1,5 +1,6 @@
 
 import 'package:drkwon/model/menu.dart';
+import 'package:drkwon/pages/admin/message_model.dart';
 import 'package:drkwon/riverpod_providers/admin_providers.dart';
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
 import 'package:drkwon/widgets/app_drawer_widget.dart';
@@ -25,81 +26,83 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
   @override
   Widget build(BuildContext context) 
   {
-    final showBanner = ref.watch(adminBannerProvider);
-    final authState = ref.watch(authNotifierProvider);
+    //final showBanner = ref.watch(adminBannerProvider);
+    //final authState = ref.watch(authNotifierProvider);
 
-    return Column
-    (  
-      children: 
-      [ 
-        //if (showBanner && authState.userType == 'admin') 
-        _adminBanner(ref),
-        Expanded
-        (   
-          child: Scaffold
-          (
-            appBar: ResponsiveWidget.isMobile(context) ? 
-            AppBar(
-                  title: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
-                          Text(
-                            routeTitles[widget.currentPath] ?? '',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  actions: 
-                  [
-                    IconButton(icon: Icon(Icons.person), onPressed: () => context.go('/profile')),
-                  ],
-                )
-                :
-              AppBar
-              (
-                scrolledUnderElevation: 0.0,
-                backgroundColor: Colors.transparent,
-                title: Row
-                (
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: 
-                  [
-                    Image.asset('assets/images/logo.jpg', height: 40), // Logo
-                    SizedBox(width: 10),
-                    Text('Optometrist Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
-                    Expanded
-                    (
-                      child: Center
-                      (
-                        child: Text
-                        (
-                          routeTitles[widget.currentPath] ?? '',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                          overflow: TextOverflow.ellipsis, // Prevent overflow issues
-                        )
-                      )
-                    )
+    return Scaffold
+    (
+      appBar: ResponsiveWidget.isMobile(context) ? 
+      AppBar(
+            title: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
+                    Text(
+                      routeTitles[widget.currentPath] ?? '',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
                   ],
                 ),
-              ),
+              ],
+            ),
+            actions: 
+            [
+              IconButton(icon: Icon(Icons.person), onPressed: () => context.go('/profile')),
+            ],
+          )
+          :
+        AppBar
+        (
+          scrolledUnderElevation: 0.0,
+          backgroundColor: Colors.transparent,
+          title: Row
+          (
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: 
+            [
+              Image.asset('assets/images/logo.jpg', height: 40), // Logo
+              SizedBox(width: 10),
+              Text('Optometrist Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
+              Expanded
+              (
+                child: Center
+                (
+                  child: Text
+                  (
+                    routeTitles[widget.currentPath] ?? '',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                    overflow: TextOverflow.ellipsis, // Prevent overflow issues
+                  )
+                )
+              )
+            ],
+          ),
+        ),
 
-            drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget(isMobile: true)) : null,
+      drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget(isMobile: true)) : null,
 
-            body: ResponsiveWidget
+      body: Column
+      (
+        children: 
+        [
+          _adminBanner(ref),
+          Expanded
+          (
+            child: ResponsiveWidget
             (
               mobile: buildMobile(),
               tablet: buildTablet(),
               desktop: buildDesktop(),
             ),
           )
-        )
-      ]
+        ]
+      ),
     );
+
+
+
   }
 
   Widget buildMobile() => widget.child;
@@ -156,6 +159,7 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
         ),
   );
 
+  // See https://chat.deepseek.com/a/chat/s/c3ef9df0-f518-458f-9a0d-fbdfc47d4218
   Widget _adminBanner(WidgetRef ref) 
   {
     return Container
@@ -190,5 +194,75 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
         ],
       ),
     );
+  }
+
+  // See https://chat.deepseek.com/a/chat/s/c3ef9df0-f518-458f-9a0d-fbdfc47d4218
+  Widget _buildMessages(WidgetRef ref) 
+  {
+    final messages = ref.watch(messageProvider);
+    final authState = ref.watch(authNotifierProvider);
+
+    return Column
+    (
+      children: 
+      [
+        for (final message in messages)
+          Container
+          (
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            color: _getMessageColor(message.type),
+            child: Row
+            (
+              children: 
+              [
+                Icon(_getMessageIcon(message.type), color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded
+                (
+                  child: Text
+                  (
+                    message.content,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                if (authState.isLoggedIn && authState.userType == 'admin')
+                  IconButton
+                  (
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => ref.read(messageProvider.notifier).removeMessage(message.id),
+                  ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Color _getMessageColor(MessageType type) 
+  {
+
+    switch (type) 
+    {
+      case MessageType.info:
+        return Colors.blue;
+      case MessageType.warning:
+        return Colors.orange;
+      case MessageType.critical:
+        return Colors.red;
+    }
+  }
+
+  IconData _getMessageIcon(MessageType type) 
+  {
+    switch (type) 
+    {
+      case MessageType.info:
+        return Icons.info;
+      case MessageType.warning:
+        return Icons.warning;
+      case MessageType.critical:
+        return Icons.error;
+    }
   }
 }
