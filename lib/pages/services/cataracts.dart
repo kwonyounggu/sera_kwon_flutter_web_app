@@ -6,18 +6,30 @@ import 'package:drkwon/widgets/components/type_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CataractsScreen extends ConsumerStatefulWidget {
+class CataractsScreen extends ConsumerStatefulWidget 
+{
   const CataractsScreen({super.key});
 
   @override
   CataractsScreenState createState() => CataractsScreenState();
 }
 
-class CataractsScreenState extends ConsumerState<CataractsScreen> {
+class CataractsScreenState extends ConsumerState<CataractsScreen> 
+{
   final _consultationFormKey = GlobalKey<FormState>();
 
+  int _getColumnCount()
+  {
+    if (MediaQuery.of(context).size.width < 400 ) return 1;
+    if (MediaQuery.of(context).size.width < 800 ) return 2;
+    return 3;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
+    //debugPrint("INFO: columnCount = ${_getColumnCount()} , width = ${MediaQuery.of(context).size.width}");
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -29,15 +41,15 @@ class CataractsScreenState extends ConsumerState<CataractsScreen> {
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
-                    'assets/images/eye_hero.jpg',
+                    'images/cataract_hero.png',
                     fit: BoxFit.cover,
                   ),
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.blue.shade900.withValues(alpha: 0.8),
-                          Colors.teal.shade300.withValues(alpha: 0.6)
+                          Colors.blue.shade900.withValues(alpha: 0.0),
+                          Colors.teal.shade300.withValues(alpha: 0.3)
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -84,34 +96,45 @@ class CataractsScreenState extends ConsumerState<CataractsScreen> {
           ),
 
           // Content Sections
-          SliverList(
-            delegate: SliverChildListDelegate([
+          SliverList
+          (
+            delegate: SliverChildListDelegate
+            (
+              [
               // Understanding Cataracts
-              _SectionWrapper(
-                children: [
+              _SectionWrapper
+              (
+                children: 
+                [
                   const SectionTitle('Understanding Cataracts'),
                   const SizedBox(height: 20),
-                  const SectionText(
+                  const SectionText
+                  (
                     'Cataracts are the leading cause of preventable blindness worldwide, affecting over 24 million Americans aged 40+.\nA cataract develops when proteins in the eye\'s natural lens break down, causing clouding that impairs vision.',
                   ),
                   const SizedBox(height: 30),
-                  GridView.count(
+                  GridView.count
+                  (
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 1,
-                    childAspectRatio: 1.2,
-                    children: const [
-                      FactCard(
+                    crossAxisCount: _getColumnCount(), 
+                    childAspectRatio: 1,
+                    children: const 
+                    [
+                      FactCard
+                      (
                         icon: Icons.access_time,
-                        title: 'Development Timeline',
+                        title: 'Development Stage',
                         text: 'Typically develops slowly over years\nInitial stages often go unnoticed',
                       ),
-                      FactCard(
+                      FactCard
+                      (
                         icon: Icons.analytics,
                         title: 'Risk Factors',
                         text: 'Aging (most common)\nDiabetes\nUV Exposure\nSmoking\nTrauma',
                       ),
-                      FactCard(
+                      FactCard
+                      (
                         icon: Icons.visibility_off,
                         title: 'Prevalence',
                         text: '50% of people develop cataracts by age 75\n24.4 million Americans affected',
@@ -186,7 +209,7 @@ class CataractsScreenState extends ConsumerState<CataractsScreen> {
                         'Monofocal\nMultifocal\nToric (Astigmatism)\nExtended Depth of Focus\nLight Adjustable Lenses',
                   ),
                   const SizedBox(height: 40),
-                  Image.asset('assets/images/surgery_tech.png'),
+                  Image.asset('images/surgery_tech.jpg'),
                 ],
               ),
 
@@ -230,7 +253,7 @@ class CataractsScreenState extends ConsumerState<CataractsScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      'Cataract Treatment Center of Excellence',
+                      'North Toronto Eye Surgery Centre',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.white,
@@ -246,17 +269,17 @@ class CataractsScreenState extends ConsumerState<CataractsScreen> {
                         FooterItem(
                           icon: Icons.location_on,
                           title: 'Locations',
-                          content: '123 Vision Blvd\nNew York, NY 10001',
+                          content: '2 Champagne Dr\nUnit C2 East Entrance\nToronto, Ontario M3J 0K2',
                         ),
                         FooterItem(
                           icon: Icons.phone,
                           title: 'Contact',
-                          content: '(555) 123-4567\n24/7 Emergency: (555) 890-1234',
+                          content: '416.792.3043\n24/7 Emergency: (416) 792-3043r',
                         ),
                         FooterItem(
                           icon: Icons.access_time,
                           title: 'Hours',
-                          content: 'Mon-Fri: 8am-7pm\nSat: 9am-5pm',
+                          content: 'Mon-Fri: 9am-5pm\nSat: 9am-3pm',
                         ),
                       ],
                     ),
@@ -323,38 +346,61 @@ class SectionText extends StatelessWidget {
   }
 }
 
-class FactCard extends StatelessWidget {
+class FactCard extends StatelessWidget 
+{
   final IconData icon;
   final String title;
   final String text;
 
-  const FactCard({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.text,
-  });
+  const FactCard
+  (
+    {
+      super.key,
+      required this.icon,
+      required this.title,
+      required this.text,
+    }
+  );
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) 
+  {
+    return Card
+    (
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
+      child: Padding
+      (
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: Column
+        (
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: 
+          [
             Icon(icon, size: 40, color: Colors.blue.shade700),
             const SizedBox(height: 15),
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600)),
+            
+            Flexible
+            (
+              child: Text
+              ( title, 
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                //maxLines: 2,
+                //overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            
             const SizedBox(height: 10),
-            Text(text,
+            Expanded
+            (
+              flex: 2,
+              child:Text
+              ( text,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey.shade600)),
+                style: TextStyle(color: Colors.grey.shade600),
+                //overflow: TextOverflow.ellipsis,
+              )
+            ),
           ],
         ),
       ),
