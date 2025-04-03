@@ -1,4 +1,5 @@
 import 'package:drkwon/temp/token_refresh_service.dart';
+import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,12 +29,13 @@ class MyApp extends ConsumerWidget
     (
       routerConfig: router,
       title: 'Eye Doctor Dr.KWON', 
-      theme: ThemeData
+      /*theme: ThemeData
       (
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         cardTheme: CardTheme(elevation: 2),
         useMaterial3: true,
-      ),
+      ),*/
+      theme: AppTheme.theme,
       scrollBehavior: CustomScrollBehavior(),
       localizationsDelegates: const [
         FlutterQuillLocalizations.delegate, // Add this delegate

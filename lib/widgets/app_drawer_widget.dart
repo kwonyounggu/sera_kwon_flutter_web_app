@@ -59,7 +59,7 @@ class AppDrawerWidget extends ConsumerWidget
                                         MenuItem.eye_exam,
                                         MenuItem.contact_lens,
                                         MenuItem.dry_eyes,
-                                        MenuItem.other_diseases
+                                        //MenuItem.other_diseases
                                         ])
                     buildMenuItem(context, ref, item, fontSize),
                 ],
