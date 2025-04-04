@@ -44,5 +44,19 @@ class AppTheme
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
           ),
         ),
+        appBarTheme: AppBarTheme
+        (
+          backgroundColor: AppConstants.backgroundColor, // AppBar background color
+        ),
+        useMaterial3: true,
+        cardTheme: CardTheme
+        ( // Define card theme here
+          color: Colors.white, // Background color of cards
+          elevation: 0.5, // Optional: Add elevation for a shadow effect
+          shape: RoundedRectangleBorder
+          ( // Optional: Round card corners
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
       );
 }

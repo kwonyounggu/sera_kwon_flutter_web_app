@@ -37,13 +37,15 @@ class MyApp extends ConsumerWidget
       ),*/
       theme: AppTheme.theme,
       scrollBehavior: CustomScrollBehavior(),
-      localizationsDelegates: const [
+      localizationsDelegates: 
+      const [
         FlutterQuillLocalizations.delegate, // Add this delegate
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const <Locale>[
+      supportedLocales: const <Locale>
+      [
         Locale('en', 'US'), // English, US
         // Add other locales as needed
       ],

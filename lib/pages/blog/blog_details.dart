@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class BlogDetailPage extends ConsumerStatefulWidget {
+class BlogDetailPage extends ConsumerStatefulWidget 
+{
   final int blogId;
 
   const BlogDetailPage({super.key, required this.blogId});
@@ -14,7 +15,8 @@ class BlogDetailPage extends ConsumerStatefulWidget {
   _BlogDetailPageState createState() => _BlogDetailPageState();
 }
 
-class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
+class _BlogDetailPageState extends ConsumerState<BlogDetailPage> 
+{
   dynamic _blog;
   List<dynamic> _comments = [];
   bool _isLoading = true;
@@ -27,7 +29,8 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   bool _showBackToTopButton = false; // Track if the "Back to Top" button should be shown
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     fetchBlog();
     fetchComments();
@@ -35,51 +38,85 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   }
 
   @override
-  void dispose() {
+  void dispose() 
+  {
     _commentScrollController.dispose();
     super.dispose();
   }
 
-  void _scrollListener() {
+  void _scrollListener() 
+  {
     // Show/hide the "Back to Top" button based on scroll position
-    if (_commentScrollController.offset >= 400 && !_showBackToTopButton) {
-      setState(() {
-        _showBackToTopButton = true;
-      });
-    } else if (_commentScrollController.offset < 400 && _showBackToTopButton) {
-      setState(() {
-        _showBackToTopButton = false;
-      });
+    if (_commentScrollController.offset >= 400 && !_showBackToTopButton) 
+    {
+      setState
+      (
+        () 
+        {
+          _showBackToTopButton = true;
+        }
+      );
+    } 
+    else if (_commentScrollController.offset < 400 && _showBackToTopButton) 
+    {
+      setState
+      (
+        () 
+        {
+          _showBackToTopButton = false;
+        }
+      );
     }
 
     // Load more comments when the user scrolls to the bottom
-    if (_commentScrollController.position.pixels == _commentScrollController.position.maxScrollExtent && !_isLoadingMoreComments && _hasMoreComments) {
-      setState(() {
-        _commentPage++;
-      });
+    if (_commentScrollController.position.pixels == _commentScrollController.position.maxScrollExtent && !_isLoadingMoreComments && _hasMoreComments) 
+    {
+      setState
+      (
+        () 
+        {
+          _commentPage++;
+        }
+      );
       fetchComments(loadMore: true);
     }
   }
 
-  Future<void> fetchBlog() async {
-    try {
+  Future<void> fetchBlog() async 
+  {
+    try 
+    {
       final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}'));
 
-      if (response.statusCode == 200) {
-        setState(() {
-          _blog = json.decode(response.body);
-        });
-      } else {
+      if (response.statusCode == 200) 
+      {
+        setState
+        (
+          () 
+          {
+            _blog = json.decode(response.body);
+          }
+        );
+      } 
+      else 
+      {
         throw Exception('Failed to load blog');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load blog: $e';
-      });
+    } 
+    catch (e) 
+    {
+      setState
+      (
+        () 
+        {
+          _errorMessage = 'Failed to load blog: $e';
+        }
+      );
     }
   }
 
-  Future<void> fetchComments({bool loadMore = false}) async {
+  Future<void> fetchComments({bool loadMore = false}) async 
+  {
     try {
       setState(() {
         if (loadMore) {
@@ -91,7 +128,8 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
 
       final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments?page=$_commentPage&per_page=$_commentsPerPage'));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200) 
+      {
         final newComments = json.decode(response.body);
         setState(() {
           if (loadMore) {
@@ -132,34 +170,43 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   }
 
   Widget _buildBlogContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Hero(
-          tag: 'blog-image-${_blog['blog_id']}',
-          child: Image.network(
-            _blog['image_url'] ?? 'https://picsum.photos/150',
-            height: 200,
-            width: double.infinity,
-            fit: BoxFit.cover,
+    return Padding
+    (
+      padding: EdgeInsets.all(12.0),
+      child: Column
+      (
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: 
+        [
+          if (_blog['image_url'] != null) Hero
+          (
+            tag: 'blog-image-${_blog['blog_id']}',
+            child: Image.network(
+              _blog['image_url'] ?? 'https://picsum.photos/150',
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        SizedBox(height: 10),
-        Text(
-          _blog['title'],
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 10),
-        Text(
-          _blog['content'],
-          style: TextStyle(fontSize: 16),
-        ),
-      ],
+          SizedBox(height: 10),
+          Text(
+            _blog['title'],
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          Text(
+            _blog['content'],
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
+      )
     );
   }
 
-  Widget _buildComments() {
-    return Expanded(
+  Widget _buildComments() 
+  {
+    return Expanded
+    (
       child: RefreshIndicator(
         onRefresh: _refreshComments,
         child: ListView.builder(
@@ -185,26 +232,31 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
             return AnimatedOpacity(
               opacity: 1.0,
               duration: Duration(milliseconds: 500),
-              child: Card(
-                margin: EdgeInsets.symmetric(vertical: 8.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        comment['content'],
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'By: ${comment['user']['name'] ?? 'Anonymous'}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
+              child:  Padding
+              (
+                padding: EdgeInsets.all(12.0),
+                child: Card
+                (
+                  margin: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          comment['content'],
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'By: ${comment['user']['name'] ?? 'Anonymous'}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              )
             );
           },
         ),
@@ -213,40 +265,59 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+  Widget build(BuildContext context) 
+  {
+    return Scaffold
+    (
+      appBar: AppBar
+      (
         title: Text(_blog != null ? _blog['title'] : 'Loading...'),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
               ? Center(child: Text(_errorMessage))
-              : Stack(
-                  children: [
-                    Column(
+              : Stack
+              (
+                  children: 
+                  [
+                    Column
+                    (
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: 
+                      [
                         _buildBlogContent(),
                         SizedBox(height: 20),
-                        Text(
-                          'Comments',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        Padding
+                        (
+                          padding: EdgeInsets.only(left: 12.0),
+                          child: Text(
+                                        'Comments',
+                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
                         ),
                         _buildComments(),
                         if (_isLoadingMoreComments)
-                          Padding(
+                          Padding
+                          (
                             padding: EdgeInsets.all(8.0),
                             child: CircularProgressIndicator(),
                           ),
                         if (!_isLoadingMoreComments && _hasMoreComments)
-                          Padding(
+                          Padding
+                          (
                             padding: EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _commentPage++;
-                                });
+                            child: ElevatedButton
+                            (
+                              onPressed: () 
+                              {
+                                setState
+                                (
+                                  () 
+                                  {
+                                    _commentPage++;
+                                  }
+                                );
                                 fetchComments(loadMore: true);
                               },
                               child: Text('Load More Comments'),

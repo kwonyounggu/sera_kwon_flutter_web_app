@@ -35,7 +35,7 @@ class _ComprehensiveExamScreenState extends ConsumerState<EyeExamScreen> {
                       background: Stack(
                         fit: StackFit.expand,
                         children: [
-                          //Image.asset('images/eye_exam_hero.png', fit: BoxFit.cover),
+                          //Image.asset('assets/images/eye_exam_hero.png', fit: BoxFit.cover),
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -220,6 +220,7 @@ class ExamProtocolSection extends StatelessWidget {
         children: [
           ExpansionTile(
             title: const Text('Phase 1: Anterior Segment Analysis'),
+            initiallyExpanded: true,
             children: const [
               ListTile(title: Text('• Slit-lamp biomicroscopy with digital documentation')),
               ListTile(title: Text('• Tear film interferometry & meibography')),
@@ -228,6 +229,7 @@ class ExamProtocolSection extends StatelessWidget {
           ),
           ExpansionTile(
             title: const Text('Phase 2: Posterior Segment Evaluation'),
+            initiallyExpanded: true,
             children: const [
               ListTile(title: Text('• 120° ultra-widefield retinal imaging')),
               ListTile(title: Text('• OCT macular cube & RNFL analysis')),
@@ -236,6 +238,7 @@ class ExamProtocolSection extends StatelessWidget {
           ),
           ExpansionTile(
             title: const Text('Phase 3: Functional Assessment'),
+            initiallyExpanded: true,
             children: const [
               ListTile(title: Text('• Contrast sensitivity under mesopic/photopic conditions')),
               ListTile(title: Text('• Color vision quantification (Farnsworth-Munsell 100 Hue)')),

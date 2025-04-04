@@ -34,7 +34,7 @@ class _ContactLensFittingsScreenState extends ConsumerState<ContactLensScreen> {
                       background: Stack(
                         fit: StackFit.expand,
                         children: [
-                          //Image.asset('images/contact_lens_fitting.jpg', fit: BoxFit.cover),
+                          //Image.asset('assets/images/contact_lens_fitting.jpg', fit: BoxFit.cover),
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -235,6 +235,7 @@ class LensTypesSection extends StatelessWidget {
         children: [
           ExpansionTile(
             title: const Text('Specialty Lenses'),
+            initiallyExpanded: true,
             children: const [
               ListTile(
                 leading: Icon(FontAwesomeIcons.circle, size: 20),
@@ -260,6 +261,7 @@ class LensTypesSection extends StatelessWidget {
           ),
           ExpansionTile(
             title: const Text('Advanced Materials'),
+            initiallyExpanded: true,
             children: const [
               ListTile(title: Text('Silicon Hydrogel (High Oxygen Permeability)')),
               ListTile(title: Text('UV-Blocking Lenses')),

@@ -44,7 +44,7 @@ class CataractsScreenState extends ConsumerState<CataractsScreen>
                   fit: StackFit.expand,
                   children: 
                   [
-                    Image.asset('images/cataract_hero.png', fit: BoxFit.cover),
+                    Image.asset('assets/images/cataract_hero.png', fit: BoxFit.cover),
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -209,7 +209,7 @@ class CataractsScreenState extends ConsumerState<CataractsScreen>
                           'Monofocal\nMultifocal\nToric (Astigmatism)\nExtended Depth of Focus\nLight Adjustable Lenses',
                     ),
                     const SizedBox(height: 40),
-                    Image.asset('images/surgery_tech.jpg'),
+                    Image.asset('assets/images/surgery_tech.jpg'),
                   ],
                 ),
 

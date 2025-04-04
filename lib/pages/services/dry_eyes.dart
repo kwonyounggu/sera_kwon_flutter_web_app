@@ -47,7 +47,7 @@ class _DryEyesScreenState extends ConsumerState<DryEyesScreen>
                         fit: StackFit.expand,
                         children: 
                         [
-                          Image.asset('images/dry_eyes.jpg', fit: BoxFit.cover),
+                          Image.asset('assets/images/dry_eyes.jpg', fit: BoxFit.cover),
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -264,6 +264,7 @@ class TreatmentsSection extends StatelessWidget
           ExpansionTile
           (
             title: const Text('Medical Management'),
+            initiallyExpanded: true,
             children: const 
             [
               ListTile(title: Text('• Preservative-free artificial tears')),
@@ -275,6 +276,7 @@ class TreatmentsSection extends StatelessWidget
           ExpansionTile
           (
             title: const Text('Advanced Procedures'),
+            initiallyExpanded: true,
             children: const [
               ListTile(title: Text('• LipiFlow Thermal Pulsation System')),
               ListTile(title: Text('• Intense Pulsed Light (IPL) Therapy')),

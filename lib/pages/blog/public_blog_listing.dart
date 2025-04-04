@@ -22,7 +22,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
   bool _hasMore = true; // Track if there are more items to load
   String _errorMessage = '';
   int _page = 1;
-  final int _perPage = 10; // Number of blogs to load per page
+  final int _perPage = 2; // 10, Number of blogs to load per page
   final ScrollController _scrollController = ScrollController();
   bool _showBackToTopButton = false; // Track if the "Back to Top" button should be shown
 
@@ -98,7 +98,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
         }
       );
 
-      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs?visibility=Public&page=$_page&per_page=$_perPage'));
+      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs?visibility=public&is_hidden=false&page=$_page&per_page=$_perPage'));
 
       if (response.statusCode == 200) 
       {
@@ -169,7 +169,9 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
       appBar: AppBar
       (
         title: Text('Public Blog'),
+        //backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       ),
+      //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator
       (
         onRefresh: _refreshBlogs,
@@ -223,7 +225,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                   child: Card
                                   (
                                     margin: EdgeInsets.all(8.0),
-                                    elevation: 4.0,
+                                    //elevation: 1.0,
                                     child: InkWell
                                     (
                                       onTap: () 
@@ -242,10 +244,11 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: 
                                         [
-                                          Hero
+                                          if (blog['image_url'] != null) Hero
                                           (
                                             tag: 'blog-image-${blog['blog_id']}',
-                                            child: Image.network(
+                                            child: Image.network
+                                            (
                                               blog['image_url'] ?? 'https://picsum.photos/150',
                                               height: 150,
                                               width: double.infinity,
