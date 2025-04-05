@@ -33,13 +33,17 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
     (
       appBar: ResponsiveWidget.isMobile(context) ? 
       AppBar(
-            title: Row(
-              children: [
-                Column(
+            title: Row
+            (
+              children: 
+              [
+                Column
+                (
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
-                    Text(
+                    Text
+                    (
                       routeTitles[widget.currentPath] ?? '',
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
@@ -111,7 +115,7 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
   ( 
     child: ConstrainedBox
     (
-      constraints: BoxConstraints(maxWidth: 1600),
+      constraints: BoxConstraints(maxWidth: 840),
       child: Row
       (
             children: 
@@ -146,7 +150,7 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
   Widget buildBody() => Container
   (
         color: Colors.grey[200],
-        padding: const EdgeInsets.all(8.0),
+        //padding: const EdgeInsets.all(8.0),
         child: Column
         (
           children: 
