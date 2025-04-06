@@ -2,9 +2,13 @@ import 'package:drkwon/pages/blog/blog_details.dart';
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+///See https://www.perplexity.ai/search/seo-related-fields-meta-title-LZzpokQoQ4KNNf1wUlralQ
+////////////////////////////////////////////////////////////////////////////////////////////////
 class PublicBlogListing extends ConsumerStatefulWidget 
 {
   const PublicBlogListing({super.key});
@@ -259,6 +263,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                   }
                                 }
                                 final blog = _blogs[index];
+                                //debugPrint("INFO: cover_image=${blog['cover_image']}");
                                 return AnimatedOpacity
                                 (
                                   opacity: 1.0,
@@ -271,31 +276,29 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                     (
                                       onTap: () 
                                       {
-                                        Navigator.push
-                                        (
-                                          context,
-                                          MaterialPageRoute
-                                          (
-                                            builder: (context) => BlogDetailPage(blogId: blog['blog_id']),
-                                          ),
-                                        );
+                                        context.push('/blogs/${blog['blog_id']}/${blog['slug']}');
                                       },
                                       child: Column
                                       (
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: 
                                         [
-                                          if (blog['image_url'] != null) Hero
+                                          /*if (blog['cover_image'] != null) Hero
                                           (
-                                            tag: 'blog-image-${blog['blog_id']}',
+                                            tag: "cover_image-${blog['blog_id']}",
                                             child: Image.network
                                             (
-                                              blog['image_url'] ?? 'https://picsum.photos/150',
+                                              blog['cover_image'],
                                               height: 150,
                                               width: double.infinity,
                                               fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) 
+                                              {
+                                                // Return nothing if the image fails to load
+                                                return const SizedBox.shrink();
+                                              },
                                             ),
-                                          ),
+                                          ),*/
                                           Padding
                                           (
                                             padding: EdgeInsets.all(8.0),

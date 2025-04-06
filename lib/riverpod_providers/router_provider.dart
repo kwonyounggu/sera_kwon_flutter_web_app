@@ -1,6 +1,7 @@
 //import 'package:drkwon/pages/blog/blog.dart';
 import 'package:drkwon/main.dart';
 import 'package:drkwon/pages/blog/blog_creation_dr.dart';
+import 'package:drkwon/pages/blog/blog_details.dart';
 import 'package:drkwon/pages/blog/public_blog_listing.dart';
 import 'package:drkwon/pages/about/about_me.dart';
 import 'package:drkwon/pages/contact/contact.dart';
@@ -51,13 +52,16 @@ final routerProvider = Provider<GoRouter>
             return '/'; // No redirection loop
           },
         ),
-        ShellRoute(
-          builder: (context, state, child) {
+        ShellRoute
+        (
+          builder: (context, state, child) 
+          {
             String currentPath = state.uri.toString();
             debugPrint("Current route in ShellRoute: $currentPath");
             return ResponsiveShellRouteWidget(currentPath: currentPath, child: child);
           },
-          routes: [
+          routes: 
+          [
             GoRoute(path: '/', name: 'home', builder: (context, state) => HomeScreen()),
             GoRoute(path: '/home', redirect: (context, state) => '/'),
             GoRoute(path: '/cataracts', name: 'cataracts', builder: (context, state) => CataractsScreen()),
@@ -65,8 +69,9 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/eye_exam', name: 'eye_exam', builder: (context, state) => EyeExamScreen()),
             GoRoute(path: '/dry_eyes', name: 'dry_eyes', builder: (context, state) => DryEyesScreen()),
             GoRoute(path: '/other_diseases', name: 'other_diseases', builder: (context, state) => OtherDiseasesScreen()),
-            GoRoute(path: '/blog_list', name: 'blog_list', builder: (context, state) => PublicBlogListing()),
-            GoRoute(path: '/blog_writing', name: 'blog_writing', builder: (context, state) => BlogCreationPage()),
+            GoRoute(path: '/blogs', name: 'blogs', builder: (context, state) => PublicBlogListing()),
+            GoRoute(path: '/blogs/:id/:slug', builder: (context, state) => BlogDetailPage(blogId:int.parse(state.pathParameters['id']!))),
+            //GoRoute(path: '/blog_writing', name: 'blog_writing', builder: (context, state) => BlogCreationPage()),
             GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
             GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),
             GoRoute(path: '/aboutme', name: 'aboutme', builder: (context, state) => AboutMeScreen()),

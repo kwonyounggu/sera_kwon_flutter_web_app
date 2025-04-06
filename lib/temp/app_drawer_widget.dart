@@ -64,7 +64,6 @@ class AppDrawerWidget extends ConsumerWidget
                     buildMenuItem(context, ref, item, fontSize),
                 ],
               ),
-              /*
               ExpansionTile
               (
                 leading: Icon(drawerItems[MenuItem.blogs]!.icon),
@@ -76,7 +75,14 @@ class AppDrawerWidget extends ConsumerWidget
                   style: TextStyle(fontSize: fontSize),
                   maxLines: 2,
                 ),
-                
+                /*initiallyExpanded: _isServicesExpanded,
+                onExpansionChanged: (expanded) 
+                {
+                  setState(() 
+                  {
+                    _isServicesExpanded = expanded;
+                  });
+                },*/
                 childrenPadding: EdgeInsets.only(left:20),
                 children: <Widget>
                 [
@@ -86,9 +92,8 @@ class AppDrawerWidget extends ConsumerWidget
                   else
                     buildMenuItemDisabled(context, ref, MenuItem.blog_writing, fontSize),
                 ],
-              ),*/
+              ),
               for (MenuItem item in [
-                                    MenuItem.blogs,
                                     MenuItem.faq, 
                                     MenuItem.contact,
                                     MenuItem.aboutme

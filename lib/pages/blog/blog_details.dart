@@ -1,6 +1,7 @@
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -153,11 +154,16 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
     }
   }
 
-  Future<void> _refreshComments() async {
-    setState(() {
-      _commentPage = 1;
-      _hasMoreComments = true; // Reset the "has more" flag when refreshing
-    });
+  Future<void> _refreshComments() async 
+  {
+    setState
+    (
+      () 
+      {
+        _commentPage = 1;
+        _hasMoreComments = true; // Reset the "has more" flag when refreshing
+      }
+    );
     await fetchComments();
   }
 
@@ -178,14 +184,20 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: 
         [
-          if (_blog['image_url'] != null) Hero
+          if (_blog['cover_image'] != null) Hero
           (
-            tag: 'blog-image-${_blog['blog_id']}',
-            child: Image.network(
-              _blog['image_url'] ?? 'https://picsum.photos/150',
+            tag: "cover_image-${_blog['blog_id']}-${_blog['slug']}",
+            child: Image.network
+            (
+              _blog['cover_image'],
               height: 200,
               width: double.infinity,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) 
+              {
+                // Return nothing if the image fails to load
+                return const SizedBox.shrink();
+              },
             ),
           ),
           SizedBox(height: 10),
@@ -271,6 +283,12 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
     (
       appBar: AppBar
       (
+        leading: Navigator.of(context).canPop() ? BackButton() : 
+                IconButton //when url was fully given in the browser like /blogs/7/team-knowledge-rate
+                (
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {context.go('/blogs');},
+                ),
         title: Text(_blog != null ? _blog['title'] : 'Loading...'),
       ),
       body: _isLoading
