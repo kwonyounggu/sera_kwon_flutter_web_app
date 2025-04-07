@@ -70,7 +70,21 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/dry_eyes', name: 'dry_eyes', builder: (context, state) => DryEyesScreen()),
             GoRoute(path: '/other_diseases', name: 'other_diseases', builder: (context, state) => OtherDiseasesScreen()),
             GoRoute(path: '/blogs', name: 'blogs', builder: (context, state) => PublicBlogListing()),
-            GoRoute(path: '/blogs/:id/:slug', builder: (context, state) => BlogDetailPage(blogId:int.parse(state.pathParameters['id']!))),
+            GoRoute
+            (
+              path: '/blogs/:id/:slug', 
+              builder: (context, state)
+              {
+                try
+                {
+                  return BlogDetailPage(blogId:int.parse(state.pathParameters['id']!));
+                }
+                catch (e)
+                {
+                  return const NotFoundScreen();
+                }
+              }
+            ),
             //GoRoute(path: '/blog_writing', name: 'blog_writing', builder: (context, state) => BlogCreationPage()),
             GoRoute(path: '/faq', name: 'faq', builder: (context, state) => FaqScreen()),
             GoRoute(path: '/contact', name: 'contact', builder: (context, state) => ContactScreen()),

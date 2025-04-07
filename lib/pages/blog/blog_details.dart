@@ -1,10 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:share_plus/share_plus.dart';
+
+
+/// See https://chat.deepseek.com/a/chat/s/afd00bf3-5753-43a0-a712-966fd9de419a
 class BlogDetailPage extends ConsumerStatefulWidget 
 {
   final int blogId;
@@ -87,6 +94,31 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
   {
     try 
     {
+      // Add connectivity check here
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) 
+      {
+        if (mounted) 
+        {
+          ScaffoldMessenger.of(context).showSnackBar
+          (
+            SnackBar
+            (
+              content: Text('No internet connection'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        setState
+        (
+          () 
+          {
+            _isLoading = false;
+            _errorMessage = 'No internet connection';
+          }
+        );
+        return;
+      }
       final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}'));
 
       if (response.statusCode == 200) 
@@ -95,7 +127,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         (
           () 
           {
-            _blog = json.decode(response.body);
+            _blog = json.decode(response.body) ?? {};
           }
         );
       } 
@@ -118,39 +150,84 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
 
   Future<void> fetchComments({bool loadMore = false}) async 
   {
-    try {
-      setState(() {
-        if (loadMore) {
-          _isLoadingMoreComments = true;
-        } else {
-          _isLoading = true;
+    try 
+    {
+      // Add connectivity check here
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) 
+      {
+        if (mounted) 
+        {
+          ScaffoldMessenger.of(context).showSnackBar
+          (
+            SnackBar
+            (
+              content: Text('No internet connection'),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
-      });
+        setState
+        (
+          () 
+          {
+            _isLoading = false;
+            _errorMessage = 'No internet connection';
+          }
+        );
+        return;
+      }
 
-      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments?page=$_commentPage&per_page=$_commentsPerPage'));
+      setState
+      (
+        () 
+        {
+          if (loadMore) 
+          {
+            _isLoadingMoreComments = true;
+          } 
+          else 
+          {
+            _isLoading = true;
+          }
+        }
+      );
+
+      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments/?page=$_commentPage&per_page=$_commentsPerPage'));
 
       if (response.statusCode == 200) 
       {
         final newComments = json.decode(response.body);
         setState(() {
-          if (loadMore) {
+          if (loadMore) 
+          {
             _comments.addAll(newComments);
-          } else {
+          } 
+          else 
+          {
             _comments = newComments;
           }
           _isLoading = false;
           _isLoadingMoreComments = false;
           _hasMoreComments = newComments.length >= _commentsPerPage; // Check if there are more comments to load
         });
-      } else {
+      } 
+      else 
+      {
         throw Exception('Failed to load comments');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load comments: $e';
-        _isLoading = false;
-        _isLoadingMoreComments = false;
-      });
+    } 
+    catch (e) 
+    {
+      setState
+      (
+        () 
+        {
+          _errorMessage = 'Failed to load comments: $e';
+          _isLoading = false;
+          _isLoadingMoreComments = false;
+        }
+      );
     }
   }
 
@@ -167,15 +244,18 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
     await fetchComments();
   }
 
-  void _scrollToTop() {
-    _commentScrollController.animateTo(
+  void _scrollToTop() 
+  {
+    _commentScrollController.animateTo
+    (
       0,
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }
 
-  Widget _buildBlogContent() {
+  Widget _buildBlogContent() 
+  {
     return Padding
     (
       padding: EdgeInsets.all(12.0),
@@ -184,32 +264,43 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: 
         [
-          if (_blog['cover_image'] != null) Hero
-          (
-            tag: "cover_image-${_blog['blog_id']}-${_blog['slug']}",
-            child: Image.network
+          if (_blog != null && _blog['cover_image'] != null && _blog!['cover_image'].isNotEmpty) 
+            Hero
             (
-              _blog['cover_image'],
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) 
-              {
-                // Return nothing if the image fails to load
-                return const SizedBox.shrink();
-              },
+              tag: "cover_image-${_blog['blog_id']}",
+              child: CachedNetworkImage
+              (
+                height: 200, 
+                width: double.infinity,
+                imageUrl: _blog['cover_image'],
+                placeholder: (context, url) => Container
+                (
+                  color: Colors.grey[200], // Match your design
+                  child: Center
+                  (
+                    child: CircularProgressIndicator
+                    (
+                      strokeWidth: 2,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                fit: BoxFit.cover,
+              )
             ),
-          ),
           SizedBox(height: 10),
-          Text(
-            _blog['title'],
+          Text
+          (
+            _blog?['title'] ?? 'Untitled Blog Post',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
-          Text(
-            _blog['content'],
-            style: TextStyle(fontSize: 16),
-          ),
+          //Text(
+          //  _blog['content'],
+          //  style: TextStyle(fontSize: 16),
+          //),
+          Html(data: _blog?['content'] ?? 'Content not available', style: {'body': Style(fontSize: FontSize(16.0)),},)
         ],
       )
     );
@@ -219,20 +310,30 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
   {
     return Expanded
     (
-      child: RefreshIndicator(
+      child: RefreshIndicator
+      (
         onRefresh: _refreshComments,
-        child: ListView.builder(
+        child: ListView.builder
+        (
           controller: _commentScrollController,
           itemCount: _comments.length + (_isLoadingMoreComments ? 1 : 0) + (_hasMoreComments ? 0 : 1), // Add 1 for "No more items"
-          itemBuilder: (context, index) {
-            if (index == _comments.length) {
-              if (_isLoadingMoreComments) {
+          itemBuilder: (context, index) 
+          {
+            if (index == _comments.length) 
+            {
+              if (_isLoadingMoreComments) 
+              {
                 return Center(child: CircularProgressIndicator());
-              } else if (!_hasMoreComments) {
-                return Padding(
+              } 
+              else if (!_hasMoreComments) 
+              {
+                return Padding
+                (
                   padding: EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Text(
+                  child: Center
+                  (
+                    child: Text
+                    (
                       'No more comments',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
@@ -241,7 +342,8 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
               }
             }
             final comment = _comments[index];
-            return AnimatedOpacity(
+            return AnimatedOpacity
+            (
               opacity: 1.0,
               duration: Duration(milliseconds: 500),
               child:  Padding
@@ -250,20 +352,26 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                 child: Card
                 (
                   margin: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Padding(
+                  child: Padding
+                  (
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
+                    child: Column
+                    (
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
+                      children: 
+                      [
+                        Text
+                        (
                           comment['content'],
                           style: TextStyle(fontSize: 16),
                         ),
                         SizedBox(height: 5),
-                        Text(
-                          'By: ${comment['user']['name'] ?? 'Anonymous'}',
+                        Text
+                        (
+                          'By: ${comment['user']?['name'] ?? 'Anonymous'}',
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
+                        
                       ],
                     ),
                   ),
@@ -284,17 +392,52 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
       appBar: AppBar
       (
         leading: Navigator.of(context).canPop() ? BackButton() : 
-                IconButton //when url was fully given in the browser like /blogs/7/team-knowledge-rate
+                IconButton //when url was fully given in the browser like /blogs/7/team-knowledge-rater
                 (
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {context.go('/blogs');},
                 ),
         title: Text(_blog != null ? _blog['title'] : 'Loading...'),
+        actions: 
+        [
+          if (_blog != null) // Only show when blog data is loaded
+            IconButton
+            (
+              icon: const Icon(Icons.share),
+              tooltip: 'Share this post',
+              onPressed: () 
+              {
+                Share.share
+                (
+                  'Check out this blog: ${_blog!['title']}\n'
+                  '$FASTAPI_URL/blogs/${_blog!['blog_id']}/${_blog!['slug'] ?? ''}'
+                );
+              },
+            ),
+          const SizedBox(width: 20),
+        ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage))
+              ? Column
+              (
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: 
+                [
+                  Text(_errorMessage),
+                  ElevatedButton
+                  (
+                    onPressed: () 
+                    {
+                      _errorMessage = '';
+                      fetchBlog();
+                      fetchComments();
+                    },
+                    child: Text('Retry'),
+                  ),
+                ],
+              )
               : Stack
               (
                   children: 
@@ -347,7 +490,9 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                       Positioned(
                         bottom: 20,
                         right: 20,
-                        child: FloatingActionButton(
+                        child: FloatingActionButton
+                        (
+                          tooltip: 'Scroll to top',
                           onPressed: _scrollToTop,                      
                           backgroundColor: Colors.blue,
                           child: Icon(Icons.arrow_upward),

@@ -105,7 +105,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
         }
       );
 
-      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs?visibility=$_visibility&is_hidden=false&page=$_page&per_page=$_perPage'));
+      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/?visibility=$_visibility&is_hidden=false&page=$_page&per_page=$_perPage'));
 
       if (response.statusCode == 200) 
       {
@@ -395,6 +395,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                           right: 20,
                           child: FloatingActionButton
                           (
+                            tooltip: 'Scroll to top',
                             onPressed: _scrollToTop,
                             backgroundColor: Colors.blue,
                             child: Icon(Icons.arrow_upward),
