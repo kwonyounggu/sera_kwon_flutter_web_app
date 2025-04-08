@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +36,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
   final int _commentsPerPage = 10; // Number of comments to load per page
   final ScrollController _commentScrollController = ScrollController();
   bool _showBackToTopButton = false; // Track if the "Back to Top" button should be shown
+  final MenuController _menuController = MenuController();
 
   @override
   void initState() 
@@ -289,12 +291,12 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                 fit: BoxFit.cover,
               )
             ),
-          SizedBox(height: 10),
+          /*SizedBox(height: 10),
           Text
           (
             _blog?['title'] ?? 'Untitled Blog Post',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+          ),*/
           SizedBox(height: 10),
           //Text(
           //  _blog['content'],
@@ -397,24 +399,63 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {context.go('/blogs');},
                 ),
-        title: Text(_blog != null ? _blog['title'] : 'Loading...'),
+
+        title: Text(_blog != null ? _blog['title'] : 'Loading...', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
         actions: 
         [
-          if (_blog != null) // Only show when blog data is loaded
-            IconButton
-            (
-              icon: const Icon(Icons.share),
-              tooltip: 'Share this post',
-              onPressed: () 
-              {
-                Share.share
+          MenuAnchor
+          (
+            controller: _menuController,
+            style: MenuStyle(  // Add this
+    backgroundColor: WidgetStateProperty.all(Colors.white),
+  ),
+            builder: (BuildContext context, MenuController controller, Widget? child) 
+            {
+              return IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+              );
+            },
+            menuChildren: 
+            [ // Using menuChildren here
+              MenuItemButton
                 (
-                  'Check out this blog: ${_blog!['title']}\n'
-                  '$FASTAPI_URL/blogs/${_blog!['blog_id']}/${_blog!['slug'] ?? ''}'
-                );
-              },
-            ),
-          const SizedBox(width: 20),
+                  onPressed: _shareBlog, 
+                  child: const Row
+                  (
+                    children: 
+                    [
+                      Icon(Icons.share, size: 18),
+                      SizedBox(width: 8),
+                      Text('Share'),
+                    ],
+                  ),
+                ),
+              
+              MenuItemButton
+                (
+                  onPressed: _copyLinkToClipboard,
+                  child: const Row
+                  (
+                    children: 
+                    [
+                      Icon(Icons.link, size: 18),
+                      SizedBox(width: 8),
+                      Text('Copy Link'),
+                    ],
+                  ),
+                ),
+              
+            ],
+          ),
+          const SizedBox(width: 10),
         ],
       ),
       body: _isLoading
@@ -454,7 +495,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                           padding: EdgeInsets.only(left: 12.0),
                           child: Text(
                                         'Comments',
-                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
                         ),
                         _buildComments(),
@@ -502,4 +543,84 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
                 ),
     );
   }
+
+  void _shareBlog() 
+  {
+    if (_blog != null) 
+    {
+      Share.share
+      (
+        'Check out this blog: ${_blog!['title']}\n'
+        '${Uri.base.origin}/#/blogs/${_blog!['blog_id']}/${_blog!['slug'] ?? ''}'
+      );
+
+    }
+    /** https://chat.deepseek.com/a/chat/s/afd00bf3-5753-43a0-a712-966fd9de419a
+     * if (_blog == null) return;
+
+  final String url = 
+    'https://yourdomain.com/blogs/${_blog!['blog_id']}/${_blog!['slug'] ?? ''}';
+  
+  Share.share(
+    'Check out this blog: ${_blog!['title']}\n$url',
+    subject: 'Interesting Blog Post', // Add subject for email clients
+  );
+     */
+  }
+
+  void _copyLinkToClipboard() 
+  {
+    if (_blog != null) 
+    {
+      final blogUrl = '${Uri.base.origin}/#/blogs/${_blog!['blog_id']}/${_blog!['slug']}';
+      Clipboard.setData(ClipboardData(text: blogUrl));
+      ScaffoldMessenger.of(context).showSnackBar
+      (
+        SnackBar(content: Text('Link copied to clipboard')),
+      );
+    }
+  }
+
+  // ignore: slash_for_doc_comments
+  /**
+   * IconButton
+   * (
+          icon: const Icon(Icons.more_vert),
+          onPressed: () {
+            _showCustomMenu(context);
+          },
+        ),
+   
+  void _showCustomMenu(BuildContext context) 
+  {
+    showModalBottomSheet
+    (
+      context: context,
+      builder: (BuildContext context) 
+      {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('Share'),
+              onTap: () {
+                Navigator.pop(context); // Close the bottom sheet
+                _shareBlog();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: const Text('Copy Link'),
+              onTap: () {
+                Navigator.pop(context); // Close the bottom sheet
+                _copyLinkToClipboard();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  */
 }
