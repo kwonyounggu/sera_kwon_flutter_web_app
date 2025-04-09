@@ -15,6 +15,7 @@ import 'package:drkwon/pages/services/dry_eyes.dart';
 import 'package:drkwon/pages/services/other_diseases.dart';
 import 'package:drkwon/pages/services/eye_exam.dart';
 import 'package:drkwon/pages/settings/my_profile.dart';
+import 'package:drkwon/pages/search/mobile_search_bar.dart';
 
 import 'package:drkwon/widgets/responsive_shell_route_widget.dart';
 import 'package:flutter/material.dart';
@@ -92,6 +93,23 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/create-account', name: 'create_account', builder: (context, state) => CreateAccountScreen()),
             GoRoute(path: '/profile', name: 'profile', builder: (context, state) => ProfileSetupScreen()),
             GoRoute(path: '/login', name: 'login', builder: (context, state) => LoginScreen()),
+            GoRoute
+            (
+              path: '/search',
+              builder: (context, state) 
+              {
+                final extra = state.extra as Map<String, dynamic>?;
+                final onSearchChanged = extra?['onSearchChanged'] as ValueChanged<String>? ?? (String query) {};
+                final onCancelSearch = extra?['onCancelSearch'] as VoidCallback? ?? () {};
+                final previousPath = extra?['previousPath'];
+                return MobileSearchScreen
+                (
+                  onSearchChanged: onSearchChanged,
+                  onCancelSearch: onCancelSearch,
+                  previousPath: previousPath
+                );
+              },
+            ),
           ],
         ),
       ],

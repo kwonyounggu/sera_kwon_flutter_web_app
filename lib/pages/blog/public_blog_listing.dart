@@ -283,22 +283,6 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: 
                                         [
-                                          /*if (blog['cover_image'] != null) Hero
-                                          (
-                                            tag: "cover_image-${blog['blog_id']}",
-                                            child: Image.network
-                                            (
-                                              blog['cover_image'],
-                                              height: 150,
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) 
-                                              {
-                                                // Return nothing if the image fails to load
-                                                return const SizedBox.shrink();
-                                              },
-                                            ),
-                                          ),*/
                                           Padding
                                           (
                                             padding: EdgeInsets.all(8.0),

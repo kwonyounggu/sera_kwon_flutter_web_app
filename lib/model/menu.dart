@@ -78,4 +78,5 @@ final Map<String, String> routeTitles =
   '/aboutme' : 'About Me',
   '/profile' : 'Update My Profile',
   '/login' : 'Your Login',
+  '/search': 'Search'
 };

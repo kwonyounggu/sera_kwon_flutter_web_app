@@ -3,6 +3,7 @@ import 'package:drkwon/model/menu.dart';
 import 'package:drkwon/pages/admin/message_model.dart';
 import 'package:drkwon/riverpod_providers/admin_providers.dart';
 import 'package:drkwon/riverpod_providers/auth_state_provider.dart';
+import 'package:drkwon/pages/search/desktop_search_bar.dart';
 import 'package:drkwon/widgets/app_drawer_widget.dart';
 import 'package:drkwon/widgets/responsive_widget.dart';
 import 'package:flutter/material.dart';
@@ -40,20 +41,57 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
                 Column
                 (
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: 
+                  [
                     Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
-                    Text
+                    SizedBox
                     (
-                      routeTitles[widget.currentPath] ?? '',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
+                      width: 200,
+                      child: Text
+                      (
+                        routeTitles[widget.currentPath] ?? widget.currentPath,
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        overflow: TextOverflow.ellipsis, // Adds "..." when text overflows
+                        maxLines: 1, // Limits the text to a single line
+                      ),
+                    )
                   ],
                 ),
               ],
             ),
             actions: 
             [
-              IconButton(icon: Icon(Icons.person), onPressed: () => context.go('/profile')),
+              IconButton
+              (
+                icon: const Icon(Icons.search),
+                onPressed: ()
+                {
+                  final currentPath = GoRouter.of(context).routeInformationProvider.value.uri.toString();
+                  if (currentPath != '/search')
+                  {
+                    context.go
+                    (
+                      '/search',
+                      extra: 
+                      {
+                        'onSearchChanged': (String query) 
+                        {
+                          print('Search query in parent: $query');
+                          // Implement your search logic here
+                        },
+                        'onCancelSearch': () 
+                        {
+                          print('Search cancelled in parent');
+                          // Implement any cancellation logic here
+                        },
+
+                        'previousPath' : currentPath
+                      },
+                    );
+                  }
+                }
+              ),
+              IconButton(icon: Icon(Icons.person), onPressed: () => context.push('/profile')),
             ],
           )
           :
@@ -73,11 +111,10 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
               (
                 child: Center
                 (
-                  child: Text
+                  child: DesktopSearchBar
                   (
-                    routeTitles[widget.currentPath] ?? '',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    overflow: TextOverflow.ellipsis, // Prevent overflow issues
+                    onSearchChanged: (query){},
+                    onCancelSearch: () {}
                   )
                 )
               )
