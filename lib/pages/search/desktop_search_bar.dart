@@ -6,6 +6,7 @@ class DesktopSearchBar extends StatefulWidget implements PreferredSizeWidget
 {
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onCancelSearch;
+  final String initialQuery;
 
   const DesktopSearchBar
   (
@@ -13,6 +14,7 @@ class DesktopSearchBar extends StatefulWidget implements PreferredSizeWidget
       super.key,
       required this.onSearchChanged,
       required this.onCancelSearch,
+      this.initialQuery = ''
     }
   );
 
@@ -20,20 +22,21 @@ class DesktopSearchBar extends StatefulWidget implements PreferredSizeWidget
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  State<DesktopSearchBar> createState() => _ProfessionalSearchBarState();
+  State<DesktopSearchBar> createState() => _DesktopSearchBarState();
 }
 
-class _ProfessionalSearchBarState extends State<DesktopSearchBar> 
+class _DesktopSearchBarState extends State<DesktopSearchBar> 
 {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
   bool _showClearButton = false;
-  Timer? _debounceTimer; // Timer for debouncing
 
   @override
   void initState() 
   {
     super.initState();
+    _controller = TextEditingController(text: widget.initialQuery);
+    _focusNode = FocusNode();
     _controller.addListener(_onTextChanged);
     _focusNode.addListener(_onFocusChanged);
   }
@@ -41,8 +44,7 @@ class _ProfessionalSearchBarState extends State<DesktopSearchBar>
   void _onTextChanged() 
   {
     setState(() => _showClearButton = _controller.text.isNotEmpty);
-    if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {widget.onSearchChanged(_controller.text);});
+    widget.onSearchChanged(_controller.text);
   }
 
   void _onFocusChanged() 
@@ -60,18 +62,16 @@ class _ProfessionalSearchBarState extends State<DesktopSearchBar>
   @override
   Widget build(BuildContext context) 
   {
-    return AppBar
-    (
+    return AppBar(
       systemOverlayStyle: SystemUiOverlayStyle.light,
       backgroundColor: Colors.transparent,
       elevation: 0,
-      shadowColor: Colors.transparent,
+      toolbarHeight: kToolbarHeight,
       title: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.fastOutSlowIn,
         height: 40,
-        decoration: BoxDecoration
-        (
+        decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -93,14 +93,16 @@ class _ProfessionalSearchBarState extends State<DesktopSearchBar>
               duration: const Duration(milliseconds: 200),
               child: IconButton(
                 icon: Icon(
-                    Icons.cancel_rounded,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+                  Icons.cancel_rounded,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
                 onPressed: _clearSearch,
               ),
             ),
             hintText: 'Search blogs and comments...',
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
             contentPadding: const EdgeInsets.symmetric(vertical: 8),
           ),
           textInputAction: TextInputAction.search,
@@ -108,25 +110,12 @@ class _ProfessionalSearchBarState extends State<DesktopSearchBar>
           onSubmitted: (value) => _focusNode.unfocus(),
         ),
       ),
-      /*actions: [ //uncomment if you need the cancel button later
-        AnimatedOpacity(
-          opacity: _controller.text.isNotEmpty ? 1.0 : 0.0, // Show if there is text
-          duration: const Duration(milliseconds: 200),
-          child: TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.primary,
-            ),
-            onPressed: _clearSearch,
-            child: const Text('Cancel'),
-          ),
-        ),
-      ],*/
     );
   }
 
   @override
-  void dispose() {
-    _debounceTimer?.cancel(); // Cancel the timer if the widget is disposed
+  void dispose() 
+  {
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();

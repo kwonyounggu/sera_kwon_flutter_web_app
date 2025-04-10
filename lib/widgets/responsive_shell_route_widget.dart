@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:drkwon/model/menu.dart';
 import 'package:drkwon/pages/admin/message_model.dart';
 import 'package:drkwon/riverpod_providers/admin_providers.dart';
@@ -23,7 +25,17 @@ class ResponsiveShellRouteWidget extends ConsumerStatefulWidget
 
 class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRouteWidget>
 {
+  final Debouncer _debouncer = Debouncer();
+  String _searchQuery = '';
+
  
+ @override
+  void dispose() 
+  {
+    _debouncer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) 
   {
@@ -32,95 +44,7 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
 
     return Scaffold
     (
-      appBar: ResponsiveWidget.isMobile(context) ? 
-      AppBar(
-            title: Row
-            (
-              children: 
-              [
-                Column
-                (
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: 
-                  [
-                    Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
-                    SizedBox
-                    (
-                      width: 200,
-                      child: Text
-                      (
-                        routeTitles[widget.currentPath] ?? widget.currentPath,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                        overflow: TextOverflow.ellipsis, // Adds "..." when text overflows
-                        maxLines: 1, // Limits the text to a single line
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            actions: 
-            [
-              IconButton
-              (
-                icon: const Icon(Icons.search),
-                onPressed: ()
-                {
-                  final currentPath = GoRouter.of(context).routeInformationProvider.value.uri.toString();
-                  if (currentPath != '/search')
-                  {
-                    context.go
-                    (
-                      '/search',
-                      extra: 
-                      {
-                        'onSearchChanged': (String query) 
-                        {
-                          print('Search query in parent: $query');
-                          // Implement your search logic here
-                        },
-                        'onCancelSearch': () 
-                        {
-                          print('Search cancelled in parent');
-                          // Implement any cancellation logic here
-                        },
-
-                        'previousPath' : currentPath
-                      },
-                    );
-                  }
-                }
-              ),
-              IconButton(icon: Icon(Icons.person), onPressed: () => context.push('/profile')),
-            ],
-          )
-          :
-        AppBar
-        (
-          scrolledUnderElevation: 0.0,
-          backgroundColor: Colors.transparent,
-          title: Row
-          (
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: 
-            [
-              Image.asset('assets/images/logo.jpg', height: 40), // Logo
-              SizedBox(width: 10),
-              Text('Optometrist Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
-              Expanded
-              (
-                child: Center
-                (
-                  child: DesktopSearchBar
-                  (
-                    onSearchChanged: (query){},
-                    onCancelSearch: () {}
-                  )
-                )
-              )
-            ],
-          ),
-        ),
+      appBar: ResponsiveWidget.isMobile(context) ? _mobileAppBar() : _desktopAppBar(),
 
       drawer: ResponsiveWidget.isMobile(context) ? const Drawer(child: AppDrawerWidget(isMobile: true)) : null,
 
@@ -200,6 +124,132 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
         ),
   );
 
+  PreferredSizeWidget _mobileAppBar() 
+  {
+    return  AppBar
+    (
+      title: Row
+      (
+        children: 
+        [
+          Column
+          (
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: 
+            [
+              Text('Optometrist Dr. S Kwon', style: TextStyle(fontSize: 16)),
+              SizedBox
+              (
+                width: 200,
+                child: Text
+                (
+                  routeTitles[widget.currentPath] ?? widget.currentPath,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  overflow: TextOverflow.ellipsis, // Adds "..." when text overflows
+                  maxLines: 1, // Limits the text to a single line
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+      actions: 
+      [
+        IconButton
+        (
+          icon: const Icon(Icons.search),
+          onPressed: ()
+          {
+            //final currentPath = GoRouter.of(context).routeInformationProvider.value.uri.toString();
+            if (widget.currentPath != '/search')
+            {
+              context.go
+              (
+                '/search',
+                extra: 
+                {
+                  'onSearchChanged': (String query) 
+                  {
+                    print('Search query in parent: $query');
+                    // Implement your search logic here
+                  },
+                  'onCancelSearch': () 
+                  {
+                    print('Search cancelled in parent');
+                    // Implement any cancellation logic here
+                  },
+
+                  'previousPath' : widget.currentPath,
+                  'device': 'mobile'
+                },
+              );
+            }
+          }
+        ),
+        IconButton(icon: Icon(Icons.person), onPressed: () => context.push('/profile')),
+      ],
+    );
+  }
+  //https://chat.deepseek.com/a/chat/s/39d82bae-d26c-4ffc-990a-137558b4cf09
+  PreferredSizeWidget _desktopAppBar() 
+  {
+    return AppBar
+    (
+      scrolledUnderElevation: 0.0,
+      backgroundColor: Colors.transparent,
+      title: Row
+      (
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: 
+        [
+          Image.asset('assets/images/logo.jpg', height: 40), // Logo
+          SizedBox(width: 10),
+          Text('Optometrist Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
+          Expanded
+          (
+            child: Center
+            (
+              child: DesktopSearchBar
+              (
+                initialQuery: _searchQuery,
+                onSearchChanged: (query) 
+                {
+                  _debouncer.run
+                  (
+                    () 
+                    {
+                      if (mounted && query.isNotEmpty) 
+                      {
+                        setState(() => _searchQuery = query);
+                        context.go
+                        (
+                          '/search', 
+                          extra: 
+                          {
+                            'query': query,
+                            'previousPath': widget.currentPath,
+                            'device': 'desktop'
+                          },
+
+                        );
+                      }
+                  });
+                },
+                onCancelSearch: () 
+                {
+                  if (mounted) 
+                  {
+                    setState(() => _searchQuery = '');
+                    context.go(widget.currentPath);
+                  }
+                }
+              )
+            )
+          )
+        ],
+      ),
+    );
+  }
   // See https://chat.deepseek.com/a/chat/s/c3ef9df0-f518-458f-9a0d-fbdfc47d4218
   Widget _adminBanner(WidgetRef ref) 
   {
@@ -307,3 +357,64 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
     }
   }
 }
+
+// Debouncer class for Search
+class Debouncer 
+{
+  final Duration duration;
+  Timer? _timer;
+
+  Debouncer({this.duration = const Duration(milliseconds: 500)});
+
+  void run(void Function() callback) 
+  {
+    _timer?.cancel();
+    _timer = Timer(duration, callback);
+  }
+
+  void cancel() 
+  {
+    _timer?.cancel();
+  }
+
+  void dispose() 
+  {
+    cancel();
+  }
+}
+
+/*
+// Search handler
+final _debouncer = Debouncer();
+List<SearchResult> _searchResults = [];
+
+void _debounceSearch(String query) async 
+{
+  _debouncer.call
+  (
+    () async 
+    {
+      if (query.isEmpty) 
+      {
+        setState(() => _searchResults = []);
+        return;
+      }
+      
+      final response = await http.get
+      (
+        Uri.parse('https://api.example.com/search?q=$query'),
+      );
+      
+      if (response.statusCode == 200) 
+      {
+        setState
+        (
+          () 
+          {
+            _searchResults = jsonDecode(response.body);
+          });
+      }
+    }
+  );
+}
+*/

@@ -6,6 +6,7 @@ import 'package:drkwon/pages/blog/public_blog_listing.dart';
 import 'package:drkwon/pages/about/about_me.dart';
 import 'package:drkwon/pages/contact/contact.dart';
 import 'package:drkwon/pages/faq/faq.dart';
+import 'package:drkwon/pages/search/desktop_search_result.dart';
 
 import 'package:drkwon/pages/services/cataracts.dart';
 import 'package:drkwon/pages/services/contact_lens.dart';
@@ -99,15 +100,24 @@ final routerProvider = Provider<GoRouter>
               builder: (context, state) 
               {
                 final extra = state.extra as Map<String, dynamic>?;
-                final onSearchChanged = extra?['onSearchChanged'] as ValueChanged<String>? ?? (String query) {};
-                final onCancelSearch = extra?['onCancelSearch'] as VoidCallback? ?? () {};
-                final previousPath = extra?['previousPath'];
-                return MobileSearchScreen
-                (
-                  onSearchChanged: onSearchChanged,
-                  onCancelSearch: onCancelSearch,
-                  previousPath: previousPath
-                );
+                final device = extra?['device'];
+
+                if (device == 'mobile')
+                {
+                  final onSearchChanged = extra?['onSearchChanged'] as ValueChanged<String>? ?? (String query) {};
+                  final onCancelSearch = extra?['onCancelSearch'] as VoidCallback? ?? () {};
+                  final previousPath = extra?['previousPath'];
+                  return MobileSearchScreen
+                  (
+                    onSearchChanged: onSearchChanged,
+                    onCancelSearch: onCancelSearch,
+                    previousPath: previousPath
+                  );
+                }
+                else //desktop
+                {
+                  return SearchResultsScreen(query: extra?['query'] ?? '');
+                }
               },
             ),
           ],
