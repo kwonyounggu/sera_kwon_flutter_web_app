@@ -62,3 +62,19 @@ class AppTheme
         ),
       );
 }
+
+String getFormattedDate(String datetime) 
+  {
+    const monthAbbreviations = 
+    [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    final date = DateTime.parse(datetime);
+    final year = date.year.toString().substring(0); // Get last 2 digits of year
+    final month = monthAbbreviations[date.month - 1];
+    final day = date.day.toString().padLeft(2, '0'); // Add leading zero if needed
+    
+    return '$year-$month-$day';
+  }

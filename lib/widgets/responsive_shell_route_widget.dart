@@ -204,7 +204,7 @@ class _ResponsiveShellRouteWidgetState extends ConsumerState<ResponsiveShellRout
         [
           Image.asset('assets/images/logo.jpg', height: 40), // Logo
           SizedBox(width: 10),
-          Text('Optometrist Dr. S Kwon', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
+          Text('Optometrist Dr. S Kwon  ', style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal, color: Colors.black)),
           Expanded
           (
             child: Center

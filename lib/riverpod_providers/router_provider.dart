@@ -74,6 +74,21 @@ final routerProvider = Provider<GoRouter>
             GoRoute(path: '/blogs', name: 'blogs', builder: (context, state) => PublicBlogListing()),
             GoRoute
             (
+              path: '/blogs/:id', 
+              builder: (context, state)
+              {
+                try
+                {
+                  return BlogDetailPage(blogId:int.parse(state.pathParameters['id']!));
+                }
+                catch (e)
+                {
+                  return const NotFoundScreen();
+                }
+              }
+            ),
+            GoRoute
+            (
               path: '/blogs/:id/:slug', 
               builder: (context, state)
               {
@@ -116,7 +131,7 @@ final routerProvider = Provider<GoRouter>
                 }
                 else //desktop
                 {
-                  return SearchResultsScreen(query: extra?['query'] ?? '');
+                  return SearchResultsScreen(query: extra?['query'] ?? '', previousPath: extra?['previousPath']);
                 }
               },
             ),

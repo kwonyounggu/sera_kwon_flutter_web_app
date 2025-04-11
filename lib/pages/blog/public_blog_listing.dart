@@ -317,7 +317,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                       mainAxisAlignment: MainAxisAlignment.end,
                                                       children: 
                                                       [
-                                                        Text('[${_blogs[index]['num_views']}]', style: _smallText,),
+                                                        Text('[${_blogs[index]['num_views']}] ', style: _smallText,),
                                                         Icon(Icons.remove_red_eye, size: 16.0, color: Colors.amber)
                                                       ]
                                                     ),
@@ -326,7 +326,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                       mainAxisAlignment: MainAxisAlignment.end,
                                                       children: 
                                                       [
-                                                        Text('[${_blogs[index]['rating']}]', style: _smallText,),
+                                                        Text('[${_blogs[index]['likes']}] ', style: _smallText,),
                                                         Icon(Icons.thumb_up, size: 16.0, color: Colors.amber)
                                                       ]
                                                     ),
