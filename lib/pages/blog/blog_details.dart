@@ -18,6 +18,7 @@ class BlogDetailPage extends ConsumerStatefulWidget {
   const BlogDetailPage({super.key, required this.blogId});
 
   @override
+  // ignore: library_private_types_in_public_api
   _BlogDetailPageState createState() => _BlogDetailPageState();
 }
 
@@ -34,8 +35,11 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   bool _showBackToTopButton = false; // Track if the "Back to Top" button should be shown
   final MenuController _menuController = MenuController();
 
+  final _smallText = TextStyle(fontSize: 12, color: Colors.grey[600]);
+
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     fetchBlog();
     fetchComments();
@@ -43,36 +47,56 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   }
 
   @override
-  void dispose() {
+  void dispose() 
+  {
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _scrollListener() {
+  void _scrollListener() 
+  {
     // Show/hide the "Back to Top" button based on scroll position
-    if (_scrollController.offset >= 400 && !_showBackToTopButton) {
-      setState(() {
-        _showBackToTopButton = true;
-      });
-    } else if (_scrollController.offset < 400 && _showBackToTopButton) {
-      setState(() {
-        _showBackToTopButton = false;
-      });
+    if (_scrollController.offset >= 400 && !_showBackToTopButton) 
+    {
+      setState
+      (
+        () 
+        {
+          _showBackToTopButton = true;
+        }
+      );
+    } 
+    else if (_scrollController.offset < 400 && _showBackToTopButton) 
+    {
+      setState
+      (
+        () 
+        {
+          _showBackToTopButton = false;
+        }
+      );
     }
 
     // Load more comments when the user scrolls to the bottom
     if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent &&
         !_isLoadingMoreComments &&
-        _hasMoreComments) {
-      setState(() {
-        _commentPage++;
-      });
+        _hasMoreComments) 
+    {
+      setState
+      (
+        () 
+        {
+          _commentPage++;
+        }
+      );
       fetchComments(loadMore: true);
     }
   }
 
-  Future<void> fetchBlog() async {
-    try {
+  Future<void> fetchBlog() async 
+  {
+    try 
+    {
       final connectivityResult = await Connectivity().checkConnectivity();
       if (connectivityResult == ConnectivityResult.none) {
         if (mounted) {
@@ -183,23 +207,30 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
     );
   }
 
-  Widget _buildBlogContent() {
-    return Padding(
+  Widget _buildBlogContent() 
+  {
+    return Padding
+    (
       padding: EdgeInsets.all(12.0),
-      child: Column(
+      child: Column
+      (
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: 
+        [
           if (_blog != null && _blog['cover_image'] != null && _blog!['cover_image'].isNotEmpty)
             Hero(
               tag: "cover_image-${_blog['blog_id']}",
-              child: CachedNetworkImage(
+              child: CachedNetworkImage
+              (
                 height: 200,
                 width: double.infinity,
                 imageUrl: _blog['cover_image'],
-                placeholder: (context, url) => Container(
+                placeholder: (context, url) => Container
+                (
                   color: Colors.grey[200],
                   child: Center(
-                    child: CircularProgressIndicator(
+                    child: CircularProgressIndicator
+                    (
                       strokeWidth: 2,
                       color: Colors.blue,
                     ),
@@ -210,7 +241,8 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
               ),
             ),
           SizedBox(height: 10),
-          Html(
+          Html
+          (
             data: _blog?['content'] ?? 'Content not available',
             style: {'body': Style(fontSize: FontSize(16.0))},
           ),
@@ -220,54 +252,161 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar
+      (
         leading: Navigator.of(context).canPop()
-            ? BackButton()
-            : IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
+            ? IconButton
+              (
+                icon: const Icon(Icons.arrow_back_ios, size: 20), // iOS-style back icon
+                padding: const EdgeInsets.only(left: 8),
+                onPressed: () 
+                {
+                  Navigator.of(context).maybePop();
+                },
+              )
+            : IconButton
+              (
+                icon: const Icon(Icons.arrow_back_ios, size: 20),
+                padding: const EdgeInsets.only(left: 8),
+                onPressed: () 
+                {
                   context.go('/blogs');
                 },
               ),
-        title: Text(
+        /*title: Text
+        (
           _blog != null ? _blog['title'] : 'Loading...',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          MenuAnchor(
+        ),*/
+      //See https://www.perplexity.ai/search/from-the-attached-file-an-over-I3LGY4IuRE.J5JouMlfG2g
+      title: _blog != null ? ConstrainedBox
+      (
+        constraints: BoxConstraints(maxWidth: 300), // Adjust maxWidth as needed
+        child: Column
+            (
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: 
+              [
+                Text
+                (
+                  _blog['title'],
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Wrap
+                (
+                  spacing: 8, // gap between adjacent items
+                  children: <Widget>
+                  [
+                    Text
+                      (
+                        'By: ${_blog['author']['name']} • ${getFormattedDate(_blog['updated_at'])}',
+                        style: _smallText,
+                        overflow: TextOverflow.ellipsis, // Handle overflow
+                      ),
+
+                    //Text
+                    //(
+                    //  getFormattedDate(_blog['updated_at']),
+                     // style: _smallText,
+                    //),
+
+                    Row
+                    (
+                      mainAxisSize: MainAxisSize.min,
+                      children: 
+                      [
+                        Text
+                        (
+                          '[${_blog['num_views']}] ',
+                          style: _smallText,
+                        ),
+                        Icon
+                        (
+                          Icons.remove_red_eye,
+                          size: 16.0,
+                          color: Colors.amber,
+                        ),
+                      ],
+                    ),
+                    //SizedBox(width: 8),
+                    Row
+                    (
+                      mainAxisSize: MainAxisSize.min,
+                      children: 
+                      [
+                        Text
+                        (
+                          '[${_blog['likes']}] ',
+                          style: _smallText,
+                        ),
+                        Icon
+                        (
+                          Icons.thumb_up,
+                          size: 16.0,
+                          color: Colors.amber,
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 8),
+                  ],
+                ),
+              ],
+            ),
+      ) : null,
+
+        actions: 
+        [
+          MenuAnchor
+          (
             controller: _menuController,
-            style: MenuStyle(
+            style: MenuStyle
+            (
               backgroundColor: WidgetStateProperty.all(Colors.white),
             ),
-            builder: (BuildContext context, MenuController controller, Widget? child) {
-              return IconButton(
+            builder: (BuildContext context, MenuController controller, Widget? child) 
+            {
+              return IconButton
+              (
                 icon: const Icon(Icons.more_vert),
                 onPressed: () {
-                  if (controller.isOpen) {
+                  if (controller.isOpen) 
+                  {
                     controller.close();
-                  } else {
+                  } 
+                  else 
+                  {
                     controller.open();
                   }
                 },
               );
             },
-            menuChildren: [
-              MenuItemButton(
+            menuChildren: 
+            [
+              MenuItemButton
+              (
                 onPressed: _shareBlog,
-                child: const Row(
-                  children: [
+                child: const Row
+                (
+                  children: 
+                  [
                     Icon(Icons.share, size: 18),
                     SizedBox(width: 8),
                     Text('Share'),
                   ],
                 ),
               ),
-              MenuItemButton(
+              MenuItemButton
+              (
                 onPressed: _copyLinkToClipboard,
-                child: const Row(
-                  children: [
+                child: const Row
+                (
+                  children: 
+                  [
                     Icon(Icons.link, size: 18),
                     SizedBox(width: 8),
                     Text('Copy Link'),

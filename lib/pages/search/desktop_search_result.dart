@@ -44,7 +44,8 @@ class SearchResultsScreen extends ConsumerWidget
             title: Text('Search results (${results.length}) for "$query"'),
             leading: IconButton
             (
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back_ios, size: 20),
+              padding: const EdgeInsets.only(left: 8),
               onPressed: () 
               {
                 if (previousPath != null) 

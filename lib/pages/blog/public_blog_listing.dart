@@ -299,9 +299,9 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                 SizedBox(height: 8),
                                                 Text
                                                 (
-                                                  _blogs[index]['excerpt'] != null && _blogs[index]['excerpt'].length > 100
-                                                                                      ? _blogs[index]['excerpt'].substring(0, 100) + '...'
-                                                                                      : _blogs[index]['excerpt'] ?? '',
+                                                  blog['excerpt'] != null && blog['excerpt'].length > 100
+                                                                                      ? blog['excerpt'].substring(0, 100) + '...'
+                                                                                      : blog['excerpt'] ?? '',
                                                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                                                 ),
                                                 SizedBox(height: 8.0),
@@ -310,14 +310,14 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween, 
                                                   children: <Widget>
                                                   [
-                                                    Text('By: ${_blogs[index]['author']['name']}', style: _smallText,),
-                                                    Text(_getFormattedDate(_blogs[index]['updated_at']), style: _smallText,),
+                                                    Text('By: ${blog['author']['name']}', style: _smallText,),
+                                                    Text(_getFormattedDate(blog['updated_at']), style: _smallText,),
                                                     Row
                                                     (
                                                       mainAxisAlignment: MainAxisAlignment.end,
                                                       children: 
                                                       [
-                                                        Text('[${_blogs[index]['num_views']}] ', style: _smallText,),
+                                                        Text('[${blog['num_views']}] ', style: _smallText,),
                                                         Icon(Icons.remove_red_eye, size: 16.0, color: Colors.amber)
                                                       ]
                                                     ),
@@ -326,7 +326,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                       mainAxisAlignment: MainAxisAlignment.end,
                                                       children: 
                                                       [
-                                                        Text('[${_blogs[index]['likes']}] ', style: _smallText,),
+                                                        Text('[${blog['likes']}] ', style: _smallText,),
                                                         Icon(Icons.thumb_up, size: 16.0, color: Colors.amber)
                                                       ]
                                                     ),
