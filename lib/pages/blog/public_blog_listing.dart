@@ -318,7 +318,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                       children: 
                                                       [
                                                         Text('[${blog['num_views']}] ', style: _smallText,),
-                                                        Icon(Icons.remove_red_eye, size: 16.0, color: Colors.amber)
+                                                        Icon(Icons.remove_red_eye_outlined, size: 16.0, color: Colors.grey)
                                                       ]
                                                     ),
                                                     Row
@@ -327,7 +327,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
                                                       children: 
                                                       [
                                                         Text('[${blog['likes']}] ', style: _smallText,),
-                                                        Icon(Icons.thumb_up, size: 16.0, color: Colors.amber)
+                                                        Icon(Icons.thumb_up_outlined, size: 16.0, color: Colors.grey)
                                                       ]
                                                     ),
                                                     const SizedBox(width: 8)

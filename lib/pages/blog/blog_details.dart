@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:drkwon/pages/blog/about_author.dart';
 import 'package:drkwon/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -133,74 +134,122 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
     }
   }
 
-  Future<void> fetchComments({bool loadMore = false}) async {
-    try {
+  Future<void> fetchComments({bool loadMore = false}) async 
+  {
+    try 
+    {
       final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+      if (connectivityResult == ConnectivityResult.none) 
+      {
+        if (mounted) 
+        {
+          ScaffoldMessenger.of(context).showSnackBar
+          (
+            SnackBar
+            (
               content: Text('No internet connection'),
               duration: Duration(seconds: 2),
             ),
           );
         }
-        setState(() {
-          _isLoading = false;
-          _errorMessage = 'No internet connection';
-        });
+        setState
+        (
+          () 
+          {
+            _isLoading = false;
+            _errorMessage = 'No internet connection';
+          }
+        );
         return;
       }
 
-      setState(() {
-        if (loadMore) {
-          _isLoadingMoreComments = true;
-        } else {
-          _isLoading = true;
-        }
-      });
-
-      final response = await http.get(
-          Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments/?page=$_commentPage&per_page=$_commentsPerPage'));
-
-      if (response.statusCode == 200) {
-        final newComments = json.decode(response.body);
-        setState(() {
-          if (loadMore) {
-            _comments.addAll(newComments);
-          } else {
-            _comments = newComments;
+      setState
+      (
+        () 
+        {
+          if (loadMore) 
+          {
+            _isLoadingMoreComments = true;
+          } 
+          else 
+          {
+            _isLoading = true;
           }
-          _isLoadingMoreComments = false;
-          _hasMoreComments = newComments.length >= _commentsPerPage;
-        });
-      } else {
+        }
+      );
+
+      final response = await http.get
+      (
+          Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/comments/?page=$_commentPage&per_page=$_commentsPerPage')
+      );
+
+      if (response.statusCode == 200) 
+      {
+        final newComments = json.decode(response.body);
+        setState
+        (
+          () 
+          {
+            if (loadMore) 
+            {
+              _comments.addAll(newComments);
+            } 
+            else 
+            {
+              _comments = newComments;
+            }
+            _isLoadingMoreComments = false;
+            _hasMoreComments = newComments.length >= _commentsPerPage;
+          }
+        );
+      } 
+      else 
+      {
         throw Exception('Failed to load comments');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load comments: $e';
-        _isLoadingMoreComments = false;
-      });
-    } finally {
-      if (!loadMore) {
-        setState(() {
-          _isLoading = false;
-        });
+    } 
+    catch (e) 
+    {
+      setState
+      (
+        () 
+        {
+          _errorMessage = 'Failed to load comments: $e';
+          _isLoadingMoreComments = false;
+        }
+      );
+    } 
+    finally 
+    {
+      if (!loadMore) 
+      {
+        setState
+        (
+          () 
+          {
+            _isLoading = false;
+          }
+        );
       }
     }
   }
 
-  Future<void> _refreshAll() async {
-    setState(() {
+  Future<void> _refreshAll() async 
+  {
+    setState
+    (
+      () 
+      {
       _commentPage = 1;
-      _hasMoreComments = true;
-    });
+        _hasMoreComments = true;
+      });
     await Future.wait([fetchBlog(), fetchComments()]);
   }
 
-  void _scrollToTop() {
-    _scrollController.animateTo(
+  void _scrollToTop() 
+  {
+    _scrollController.animateTo
+    (
       0,
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
@@ -246,6 +295,44 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
             data: _blog?['content'] ?? 'Content not available',
             style: {'body': Style(fontSize: FontSize(16.0))},
           ),
+          SizedBox(height: 10),
+          Row
+          (
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: 
+            [
+              Row
+              (
+                children: 
+                [
+                  SizedBox(width: 8),
+                  Icon(Icons.thumb_up_outlined, color: Colors.grey, size: 18),
+                  SizedBox(width: 12),
+                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 18),
+                  SizedBox(width: 8),
+                  Text('Leave a comment', style: _smallText),
+                ]
+              ),
+              
+              const Row
+              (
+                children: 
+                [
+                  Icon(Icons.share_outlined, color: Colors.grey, size: 18),
+                  SizedBox(width: 8)
+                ]
+              ),
+            ],
+          ),
+
+          SizedBox(height: 24),
+          AboutAuthor
+          (
+            authorName: 'John Doe',
+            authorImageUrl: 'https://picsum.photos/100/100', // Replace with the actual URL of the author's image
+            authorDescription:
+                'John Doe is a passionate blogger who loves to share his thoughts and experiences on various topics.',
+          ),
         ],
       ),
     );
@@ -284,7 +371,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
       //See https://www.perplexity.ai/search/from-the-attached-file-an-over-I3LGY4IuRE.J5JouMlfG2g
       title: _blog != null ? ConstrainedBox
       (
-        constraints: BoxConstraints(maxWidth: 300), // Adjust maxWidth as needed
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8), // Adjust maxWidth as needed
         child: Column
             (
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,13 +395,6 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                         style: _smallText,
                         overflow: TextOverflow.ellipsis, // Handle overflow
                       ),
-
-                    //Text
-                    //(
-                    //  getFormattedDate(_blog['updated_at']),
-                     // style: _smallText,
-                    //),
-
                     Row
                     (
                       mainAxisSize: MainAxisSize.min,
@@ -327,9 +407,9 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                         ),
                         Icon
                         (
-                          Icons.remove_red_eye,
+                          Icons.remove_red_eye_outlined,
                           size: 16.0,
-                          color: Colors.amber,
+                          color: Colors.grey,
                         ),
                       ],
                     ),
@@ -346,9 +426,9 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                         ),
                         Icon
                         (
-                          Icons.thumb_up,
+                          Icons.thumb_up_outlined,
                           size: 16.0,
-                          color: Colors.amber,
+                          color: Colors.grey,
                         ),
                       ],
                     ),
@@ -421,12 +501,16 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Column(
+              ? Column
+              (
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: 
+                  [
                     Text(_errorMessage),
-                    ElevatedButton(
-                      onPressed: () {
+                    ElevatedButton
+                    (
+                      onPressed: () 
+                      {
                         _errorMessage = '';
                         fetchBlog();
                         fetchComments();
@@ -435,44 +519,64 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                     ),
                   ],
                 )
-              : RefreshIndicator(
+              : RefreshIndicator
+              (
                   onRefresh: _refreshAll,
-                  child: Stack(
-                    children: [
-                      CustomScrollView(
+                  child: Stack
+                  (
+                    children: 
+                    [
+                      CustomScrollView
+                      (
                         controller: _scrollController,
                         physics: AlwaysScrollableScrollPhysics(), // Ensures single scrollbar behavior
-                        slivers: [
+                        slivers: 
+                        [
                           // Blog content as a sliver
-                          SliverToBoxAdapter(
+                          SliverToBoxAdapter
+                          (
                             child: _buildBlogContent(),
                           ),
                           // Spacing between blog and comments
-                          SliverToBoxAdapter(
+                          SliverToBoxAdapter
+                          (
                             child: SizedBox(height: 20),
                           ),
                           // Comments header
-                          SliverToBoxAdapter(
-                            child: Padding(
+                          SliverToBoxAdapter
+                          (
+                            child: Padding
+                            (
                               padding: EdgeInsets.only(left: 12.0),
-                              child: Text(
+                              child: Text
+                              (
                                 'Comments',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
                           // Comments list (no separate scrollbar, part of the main scroll)
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                if (index == _comments.length) {
-                                  if (_isLoadingMoreComments) {
+                          SliverList
+                          (
+                            delegate: SliverChildBuilderDelegate
+                            (
+                              (context, index) 
+                              {
+                                if (index == _comments.length) 
+                                {
+                                  if (_isLoadingMoreComments) 
+                                  {
                                     return Center(child: CircularProgressIndicator());
-                                  } else if (!_hasMoreComments) {
-                                    return Padding(
+                                  } 
+                                  else if (!_hasMoreComments) 
+                                  {
+                                    return Padding
+                                    (
                                       padding: EdgeInsets.all(16.0),
-                                      child: Center(
-                                        child: Text(
+                                      child: Center
+                                      (
+                                        child: Text
+                                        (
                                           'No more comments',
                                           style: TextStyle(fontSize: 16, color: Colors.grey),
                                         ),
@@ -481,27 +585,69 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                                   }
                                 }
                                 final comment = _comments[index];
-                                return AnimatedOpacity(
+                                return AnimatedOpacity
+                                (
                                   opacity: 1.0,
                                   duration: Duration(milliseconds: 500),
-                                  child: Padding(
+                                  child: Padding
+                                  (
                                     padding: EdgeInsets.all(12.0),
-                                    child: Card(
+                                    child: Card
+                                    (
                                       margin: EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Padding(
+                                      child: Padding
+                                      (
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Column(
+                                        child: Column
+                                        (
                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
+                                          children: 
+                                          [
+                                            Text
+                                            (
                                               comment['content'],
                                               style: TextStyle(fontSize: 16),
                                             ),
                                             SizedBox(height: 5),
-                                            Text(
-                                              'By: ${comment['user']?['name'] ?? 'Anonymous'}',
-                                              style: TextStyle(fontSize: 12, color: Colors.grey),
-                                            ),
+                                            Row
+                                                (
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.center, // Ensures vertical alignment
+                                                  children: 
+                                                  [ 
+                                                    Flexible
+                                                    (
+                                                      child: Text
+                                                      (
+                                                        'By: ${comment['user']?['name'] ?? 'Anonymous'} • ${getFormattedDate(comment['created_at'])}',
+                                                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                                                        overflow: TextOverflow.ellipsis,
+                                                        maxLines: 1,
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                    Row
+                                                    (
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      //mainAxisAlignment: MainAxisAlignment.end,
+                                                      children: 
+                                                      [
+                                                        Text
+                                                        (
+                                                          '[${comment['likes']}] ',
+                                                          style: _smallText,
+                                                        ),
+                                                        Icon
+                                                        (
+                                                          Icons.thumb_up_outlined,
+                                                          size: 16.0,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 8)
+                                                  ]
+                                                )
                                           ],
                                         ),
                                       ),
@@ -509,9 +655,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                                   ),
                                 );
                               },
-                              childCount: _comments.length +
-                                  (_isLoadingMoreComments ? 1 : 0) +
-                                  (_hasMoreComments ? 0 : 1),
+                              childCount: _comments.length + (_isLoadingMoreComments ? 1 : 0) + (_hasMoreComments ? 0 : 1),
                             ),
                           ),
                           // Load more button as a sliver
