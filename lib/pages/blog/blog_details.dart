@@ -326,12 +326,12 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
           ),
 
           SizedBox(height: 24),
-          AboutAuthor
+          if (_blog != null) AboutAuthor
           (
-            authorName: 'John Doe',
+            authorName: '${_blog['author']['name']}',
             authorImageUrl: 'https://picsum.photos/100/100', // Replace with the actual URL of the author's image
             authorDescription:
-                'John Doe is a passionate blogger who loves to share his thoughts and experiences on various topics.',
+                '${_blog['author']['name']} is a passionate blogger who loves to share his thoughts and experiences on various topics.',
           ),
         ],
       ),
@@ -609,7 +609,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                                               style: TextStyle(fontSize: 16),
                                             ),
                                             SizedBox(height: 5),
-                                            Row
+                                            /*Row
                                                 (
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   crossAxisAlignment: CrossAxisAlignment.center, // Ensures vertical alignment
@@ -647,7 +647,46 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                                                     ),
                                                     const SizedBox(width: 8)
                                                   ]
-                                                )
+                                                ),*/
+                                            Row
+                                            (
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: 
+                                              [
+                                                Row
+                                                (
+                                                  children: 
+                                                  [
+                                                    Text
+                                                    (
+                                                      'By: ${comment['user']?['name'] ?? 'Anonymous'} • ${getFormattedDate(comment['created_at'])}',
+                                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ]
+                                                ),
+                                                
+                                                Row
+                                                (
+                                                  children: 
+                                                  [
+                                                    Text
+                                                    (
+                                                      '[${comment['likes']}] ',
+                                                      style: _smallText,
+                                                    ),
+                                                    Icon
+                                                    (
+                                                      Icons.thumb_up_outlined,
+                                                      size: 16.0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    SizedBox(width: 8)
+                                                  ]
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),

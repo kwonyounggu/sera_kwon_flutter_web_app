@@ -109,6 +109,7 @@ class _PublicBlogListingState extends ConsumerState<PublicBlogListing>
 
       if (response.statusCode == 200) 
       {
+        debugPrint("INFO: (blog list) ${response.body}");
         final newBlogs = json.decode(response.body);
         setState
         (
