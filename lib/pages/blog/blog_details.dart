@@ -13,7 +13,16 @@ import 'dart:convert';
 import 'package:share_plus/share_plus.dart';
 
 /// See https://chat.deepseek.com/a/chat/s/afd00bf3-5753-43a0-a712-966fd9de419a
-class BlogDetailPage extends ConsumerStatefulWidget {
+/// See https://grok.com/chat/4ba28422-595c-4b11-be92-e9633ca631d3 for additional likes/dislikes for this blog
+
+// Provider for blog reaction state
+final blogReactionProvider = StateProvider.family<String?, int>((ref, blogId) => null);
+
+// Provider for like/dislike counts
+final blogCountsProvider = StateProvider.family<Map<String, int>, int>((ref, blogId) => {'likes': 0, 'dislikes': 0,});
+
+class BlogDetailPage extends ConsumerStatefulWidget 
+{
   final int blogId;
 
   const BlogDetailPage({super.key, required this.blogId});
@@ -23,7 +32,8 @@ class BlogDetailPage extends ConsumerStatefulWidget {
   _BlogDetailPageState createState() => _BlogDetailPageState();
 }
 
-class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
+class _BlogDetailPageState extends ConsumerState<BlogDetailPage> 
+{
   dynamic _blog;
   List<dynamic> _comments = [];
   bool _isLoading = true;
@@ -116,21 +126,48 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
       }
       final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}'));
 
-      if (response.statusCode == 200) {
-        setState(() {
-          _blog = json.decode(response.body) ?? {};
-        });
-      } else {
+      if (response.statusCode == 200) 
+      {
+        setState
+        (
+          () 
+          {
+            _blog = json.decode(response.body) ?? {};
+            // Update counts provider
+            ref.read(blogCountsProvider(widget.blogId).notifier).state = 
+            {
+              'likes': _blog['likes'] ?? 0,
+              'dislikes': _blog['dislikes'] ?? 0,
+            };
+            // Update reaction provider
+            ref.read(blogReactionProvider(widget.blogId).notifier).state = _blog['user_reaction'];
+          }
+        );
+      } 
+      else 
+      {
         throw Exception('Failed to load blog');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load blog: $e';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    } 
+    catch (e) 
+    {
+      setState
+      (
+        () 
+        {
+          _errorMessage = 'Failed to load blog: $e';
+        }
+      );
+    } 
+    finally 
+    {
+      setState
+      (
+        () 
+        {
+          _isLoading = false;
+        }
+      );
     }
   }
 
@@ -234,16 +271,105 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
     }
   }
 
+  Future<void> fetchUserReaction() async 
+  {
+    try 
+    {
+      final response = await http.get
+      (
+        Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/my-reaction'),
+        headers: 
+        {
+          // Add authentication headers (e.g., Bearer token) if required
+          // 'Authorization': 'Bearer <your_token>',
+        },
+      );
+      if (response.statusCode == 200) 
+      {
+        final reaction = json.decode(response.body);
+        ref.read(blogReactionProvider(widget.blogId).notifier).state = reaction?['reaction_type'];
+      }
+    } 
+    catch (e) 
+    {
+      print('Failed to fetch user reaction: $e');
+    }
+  }
+
+  Future<void> toggleReaction(String reactionType) async 
+  {
+    try 
+    {
+      final currentReaction = ref.read(blogReactionProvider(widget.blogId));
+      final counts = ref.read(blogCountsProvider(widget.blogId));
+
+      // Optimistically update UI
+      if (currentReaction == reactionType) 
+      {
+        // Cancel reaction
+        ref.read(blogReactionProvider(widget.blogId).notifier).state = null;
+        ref.read(blogCountsProvider(widget.blogId).notifier).state = {
+          'likes': reactionType == 'like' ? counts['likes']! - 1 : counts['likes']!,
+          'dislikes': reactionType == 'dislike' ? counts['dislikes']! - 1 : counts['dislikes']!,
+        };
+      } 
+      else 
+      {
+        // Update or switch reaction
+        ref.read(blogReactionProvider(widget.blogId).notifier).state = reactionType;
+        ref.read(blogCountsProvider(widget.blogId).notifier).state = 
+        {
+          'likes': reactionType == 'like'
+              ? counts['likes']! + 1
+              : (currentReaction == 'like' ? counts['likes']! - 1 : counts['likes']!),
+          'dislikes': reactionType == 'dislike'
+              ? counts['dislikes']! + 1
+              : (currentReaction == 'dislike' ? counts['dislikes']! - 1 : counts['dislikes']!),
+        };
+      }
+
+      final response = await http.post
+      (
+        Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/reaction'),
+        headers: 
+        {
+          'Content-Type': 'application/json',
+          // Add authentication headers if required
+        },
+        body: json.encode({'reaction_type': reactionType}),
+      );
+
+      if (response.statusCode != 200) 
+      {
+        // Revert UI on failure
+        ref.read(blogReactionProvider(widget.blogId).notifier).state = currentReaction;
+        ref.read(blogCountsProvider(widget.blogId).notifier).state = counts;
+        ScaffoldMessenger.of(context).showSnackBar
+        (
+          SnackBar(content: Text('Failed to update reaction')),
+        );
+      }
+    } 
+    catch (e) 
+    {
+      ScaffoldMessenger.of(context).showSnackBar
+      (
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   Future<void> _refreshAll() async 
   {
     setState
     (
       () 
       {
-      _commentPage = 1;
+        _commentPage = 1;
         _hasMoreComments = true;
-      });
-    await Future.wait([fetchBlog(), fetchComments()]);
+      }
+    );
+    await Future.wait([fetchBlog(), fetchComments(), fetchUserReaction()]);
   }
 
   void _scrollToTop() 
@@ -258,6 +384,9 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
 
   Widget _buildBlogContent() 
   {
+    final reaction = ref.watch(blogReactionProvider(widget.blogId));
+    final counts = ref.watch(blogCountsProvider(widget.blogId));
+
     return Padding
     (
       padding: EdgeInsets.all(12.0),
@@ -306,7 +435,17 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                 children: 
                 [
                   SizedBox(width: 8),
-                  Icon(Icons.thumb_up_outlined, color: Colors.grey, size: 18),
+
+                  IconButton(
+                    icon: Icon(
+                      Icons.thumb_up,
+                      color: reaction == 'like' ? Colors.blue : Colors.grey,
+                      size: 18,
+                    ),
+                    onPressed: () => toggleReaction('like'),
+                  ),
+                  Text('${counts['likes']}', style: _smallText),
+
                   SizedBox(width: 12),
                   Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 18),
                   SizedBox(width: 8),
@@ -421,7 +560,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                       [
                         Text
                         (
-                          '[${_blog['likes']}] ',
+                          '[${ref.watch(blogCountsProvider(widget.blogId))['likes']}] ',
                           style: _smallText,
                         ),
                         Icon
@@ -609,45 +748,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage> {
                                               style: TextStyle(fontSize: 16),
                                             ),
                                             SizedBox(height: 5),
-                                            /*Row
-                                                (
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.center, // Ensures vertical alignment
-                                                  children: 
-                                                  [ 
-                                                    Flexible
-                                                    (
-                                                      child: Text
-                                                      (
-                                                        'By: ${comment['user']?['name'] ?? 'Anonymous'} • ${getFormattedDate(comment['created_at'])}',
-                                                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 1,
-                                                      ),
-                                                    ),
-                                                    Spacer(),
-                                                    Row
-                                                    (
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      //mainAxisAlignment: MainAxisAlignment.end,
-                                                      children: 
-                                                      [
-                                                        Text
-                                                        (
-                                                          '[${comment['likes']}] ',
-                                                          style: _smallText,
-                                                        ),
-                                                        Icon
-                                                        (
-                                                          Icons.thumb_up_outlined,
-                                                          size: 16.0,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(width: 8)
-                                                  ]
-                                                ),*/
+
                                             Row
                                             (
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

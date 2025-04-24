@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 //final String FASTAPI_URL = "http://api.webmonster.ca";
 //final String FASTAPI_URL = "http://localhost:8000";
-final String FASTAPI_URL = "http://192.168.3.50:8000";
+final String FASTAPI_URL = "http://192.168.154.50:8000";
 
 final int TOKEN_REFRESH_TIME_MIN = 2; //14
 
