@@ -216,6 +216,16 @@ class AuthNotifier extends StateNotifier<AuthState> with WidgetsBindingObserver
     authStateListenable.value = state; // Notify listeners
   }
 
+  //Added April 26 2025
+  Future<String?>? getToken()
+  {
+    if (state.isLoggedIn)
+    {
+      return _storage.read(key: 'jwt');
+    }
+    return null;
+  }
+
   void createAccount(String userId) 
   {
     //state = state.copyWith(isLoggedIn: true, userId: userId);

@@ -12,6 +12,8 @@ import 'dart:convert';
 
 import 'package:share_plus/share_plus.dart';
 
+import '../../riverpod_providers/auth_state_provider.dart';
+
 /// See https://chat.deepseek.com/a/chat/s/afd00bf3-5753-43a0-a712-966fd9de419a
 /// See https://grok.com/chat/4ba28422-595c-4b11-be92-e9633ca631d3 for additional likes/dislikes for this blog
 
@@ -54,6 +56,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
     super.initState();
     fetchBlog();
     fetchComments();
+    fetchUserReaction();
     _scrollController.addListener(_scrollListener);
   }
 
@@ -124,7 +127,10 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         });
         return;
       }
-      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}'));
+
+      final token = ref.read(authNotifierProvider.notifier).getToken();
+      final headers = token != null ? <String, String>{'Authorization': 'Bearer $token'} : <String, String>{};
+      final response = await http.get(Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}'), headers: headers,);
 
       if (response.statusCode == 200) 
       {
@@ -146,7 +152,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
       } 
       else 
       {
-        throw Exception('Failed to load blog');
+        throw Exception('Failed to load blog: ${response.statusCode}');
       }
     } 
     catch (e) 
@@ -273,6 +279,13 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
 
   Future<void> fetchUserReaction() async 
   {
+    final token = ref.read(authNotifierProvider.notifier).getToken();
+    if (token == null) 
+    {
+      ref.read(blogReactionProvider(widget.blogId).notifier).state = null;
+      return;
+    }
+
     try 
     {
       final response = await http.get
@@ -280,14 +293,17 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         Uri.parse('$FASTAPI_URL/blogs/${widget.blogId}/my-reaction'),
         headers: 
         {
-          // Add authentication headers (e.g., Bearer token) if required
-          // 'Authorization': 'Bearer <your_token>',
+          'Authorization': 'Bearer $token'
         },
       );
       if (response.statusCode == 200) 
       {
         final reaction = json.decode(response.body);
         ref.read(blogReactionProvider(widget.blogId).notifier).state = reaction?['reaction_type'];
+      }
+      else if (response.statusCode == 401) 
+      {
+        ref.read(authNotifierProvider.notifier).logout(); // Clear token on unauthorized
       }
     } 
     catch (e) 
@@ -298,6 +314,29 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
 
   Future<void> toggleReaction(String reactionType) async 
   {
+    final token = ref.read(authNotifierProvider.notifier).getToken();
+
+    if (token == null) 
+    {
+      // Prompt user to log in
+      ScaffoldMessenger.of(context).showSnackBar
+      (
+        SnackBar
+        (
+          content: Text('Please log in to like this post'),
+          action: SnackBarAction
+          (
+            label: 'Log In',
+            onPressed: () 
+            {
+              context.go('/login'); // Adjust to your login route
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
     try 
     {
       final currentReaction = ref.read(blogReactionProvider(widget.blogId));
@@ -308,7 +347,8 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
       {
         // Cancel reaction
         ref.read(blogReactionProvider(widget.blogId).notifier).state = null;
-        ref.read(blogCountsProvider(widget.blogId).notifier).state = {
+        ref.read(blogCountsProvider(widget.blogId).notifier).state = 
+        {
           'likes': reactionType == 'like' ? counts['likes']! - 1 : counts['likes']!,
           'dislikes': reactionType == 'dislike' ? counts['dislikes']! - 1 : counts['dislikes']!,
         };
@@ -335,6 +375,7 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         {
           'Content-Type': 'application/json',
           // Add authentication headers if required
+          'Authorization': 'Bearer $token',
         },
         body: json.encode({'reaction_type': reactionType}),
       );
@@ -344,18 +385,29 @@ class _BlogDetailPageState extends ConsumerState<BlogDetailPage>
         // Revert UI on failure
         ref.read(blogReactionProvider(widget.blogId).notifier).state = currentReaction;
         ref.read(blogCountsProvider(widget.blogId).notifier).state = counts;
-        ScaffoldMessenger.of(context).showSnackBar
-        (
-          SnackBar(content: Text('Failed to update reaction')),
-        );
+        if (context.mounted)
+        {
+          ScaffoldMessenger.of(context).showSnackBar
+          (
+            SnackBar(content: Text('Failed to update reaction')),
+          );
+        }
+        if (response.statusCode == 401) 
+        {
+          ref.read(authNotifierProvider.notifier).logout(); // Clear token on unauthorized
+          context.go('/login');
+        }
       }
     } 
     catch (e) 
     {
-      ScaffoldMessenger.of(context).showSnackBar
-      (
-        SnackBar(content: Text('Error: $e')),
-      );
+      if (context.mounted)
+      {
+        ScaffoldMessenger.of(context).showSnackBar
+        (
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
